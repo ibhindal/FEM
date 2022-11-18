@@ -8,17 +8,23 @@ This code has been tested in Python 3.10.8
 Required Modules and their tested versions
 - numpy
 - scipy
+-meshio
+-matplotlib
 - ...
-
 Input files used to test program
 - simpleMod.geo
 - simpleMod.vsh
 - ...
 
+
+
+
+
+
+
 ----------------------------------------------------------------------------------------
 To do list
 - 
-
 
 
 
