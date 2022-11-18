@@ -1,3 +1,4 @@
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from matplotlib import rc
@@ -15,7 +16,7 @@ from DirichletBC import DirichletBC
 
 ################################################################
 # read the mesh file
-filenm = 'plateHole_linear.msh'
+filenm = 'CW_P1_Prothesis.txt'
 mesh = meshio.read(filenm)  # optionally specify file_format
 
 
