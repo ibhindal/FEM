@@ -6,6 +6,7 @@ import numpy as np
 import scipy as sp
 from scipy import sparse, io
 from scipy.sparse import linalg
+import latex
 
 import meshio
 
