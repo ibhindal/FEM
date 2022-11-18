@@ -16,4 +16,4 @@ import strainDisp2D
 #############################################
 
 
-filenm = 'plateHole.msh'
+filenm = 'CW_P1_Prothesis.txt'
