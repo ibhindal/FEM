@@ -17,4 +17,3 @@ import strainDisp2D
 
 
 filenm = 'plateHole.msh'
-mesh = meshio.read(filenm) # optionally specify file_format
