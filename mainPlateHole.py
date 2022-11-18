@@ -16,14 +16,14 @@ from DirichletBC import DirichletBC
 
 ################################################################
 # read the mesh file
-filenm = 'CW_P1_Prothesis.txt'
+filenm = 'plateHole_linear.vtk'
 mesh = meshio.read(filenm)  # optionally specify file_format
 
 
 dofpn = 3                               # dof per node
-nelem = mesh.cells['quad'].shape[0]     # number of elements
-npe = mesh.cells['quad'].shape[1]       # nodes per element
-con_mat = mesh.cells['quad']            # connectivity matrix
+nelem = mesh.cells_dict['quad'].shape[0]     # number of elements
+npe = mesh.cells_dict['quad'].shape[1]       # nodes per element
+con_mat = mesh.cells_dict['quad']            # connectivity matrix
 nodeCoor = mesh.points                  # node coordinate matrix
 nnodes = mesh.points.shape[0]           # number of nodes
 ndof = nnodes*dofpn                     # total number of dof
