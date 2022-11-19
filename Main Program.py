@@ -12,8 +12,11 @@ import JacobianMat
 import shapeFun
 import shapefunDeri
 import strainDisp2D
+import mainmesh
 
 #############################################
 
 
 filenm = 'CW_P1_Prothesis.txt'
+
+mainmesh.mainmesh(filenm)

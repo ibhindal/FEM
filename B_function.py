@@ -9,8 +9,8 @@ import strainDisp2D
 
 def B_function(xi, eta):
     xi, eta = 1.,-1. # user-defined local coordinate 
-    N = shapefun(xi, eta) 
-    dndx, dnde = shapefunDeri(xi, eta) 
+    N = shapeFun.elem_shape(xi, eta) 
+    dndx, dnde = shapefunDeri.shapefunDeri(xi, eta) 
     nodeXY = np.array([[0.0, 0.0], 
                         [100.0, 0.0], 
                         [100.0, 100.0], 
@@ -22,7 +22,7 @@ def B_function(xi, eta):
 
     Jacob, SF = {}, {} 
     SF['sf'], SF['dndx'], SF['dnde'] = N, dndx, dnde 
-    Jacob['J'], Jacob['detJ'], Jacob['invJ'] = ajacob(SF['dndx'], 
-                                                    SF['dnde'], nodeXY) 
-    B = strainDisp2D(SF,nodeXY,Jacob)
+    Jacob['J'], Jacob['detJ'], Jacob['invJ'] = JacobianMat.ajacob(SF['dndx'], 
+                                                                  SF['dnde'], nodeXY) 
+    B = strainDisp2D.strainDisp2D(SF,nodeXY,Jacob)
     return B
