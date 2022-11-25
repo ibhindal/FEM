@@ -39,7 +39,7 @@ for ii in range(nquad) :
             
 
 shapefundx,shapefunde = []
-jacob=
+jacob = 
 count = 1
 
 
