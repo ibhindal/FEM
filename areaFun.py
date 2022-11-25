@@ -25,4 +25,4 @@ A : area of the quadrangular element
             sf, dsfdx, dsfde = shapeFun.elem_shape(xi,eta,nne)
             jacobmat, detj = ajacob(dsfdx, dsfde, xyel)
             A = A + detj*qwt[ii]*qwt[jj]
-    return A
+    return A, xi, eta
