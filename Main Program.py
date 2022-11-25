@@ -20,3 +20,5 @@ import mainmesh
 filenm = 'CW_P1_Prothesis.txt'
 
 mainmesh.mainmesh(filenm)
+
+mesh = meshio.read("linear_Mesh.vtk") 

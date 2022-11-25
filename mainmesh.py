@@ -112,7 +112,7 @@ def mainmesh(filenm) :
 
 
     meshvtk.cell_data = mesh.cell_data
-    meshio.write("plateHole_linear_U.vtk", meshvtk)
+    meshio.write("linear_Mesh.vtk", meshvtk)
 
 
 
