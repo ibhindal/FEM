@@ -20,26 +20,32 @@ import pandas as pd
 filenm = 'CW_P1_Prothesis.txt'
 
 mesh = meshio.read(filenm) 
-mesh.msh[quads]
+#mesh.msh[quads]
+"""
+For Matlab:
+flnm = "ke.mat"
+fl_list = sp.io.loadmat(flnm)
+Kel = fl_list['ke']
+"""
+
 
 p,w = GaussQuad.GaussQuad(2)
 
 qpt=p 
 qwt=w 
 
-nne = xyel.shape[0]
 nquad = qpt.shape[0]
 ke = np.zeros([8,8])
 for ii in range(nquad) :
     for jj in range(nquad) :
         xi = qpt[ii]
         eta = qpt[jj]
-        sf, dsfdx, dsfde = shapeFun.elem_shape(xi,eta,nne)
-        jacobmat, detj = ajacob(dsfdx, dsfde, xyel)
+        dsfdx, dsfde = shapefunDeri.shapefunDeri(xi,eta)
+        jacobmat, detj = JacobianMat.ajacob(dsfdx, dsfde, xyel)
             
 
 shapefundx,shapefunde = []
-jacob = 
+jacob = []
 count = 1
 
 
@@ -50,10 +56,9 @@ for i in range(2) :
     
         jacob=JacobianMat.jacobmat(shapefundx,shapefunde,count)
     
-        areaFun.areaFun()
+        bfun=B_function.B_function(xi,eta)
 
-        B_function.B_function()
-
+    #ke=ke +np.inv(Bfun) * Ce * bfun
   
 
     strainDisp2D.strainDisp2D()

@@ -25,4 +25,5 @@ def B_function(xi, eta):
     Jacob['J'], Jacob['detJ'], Jacob['invJ'] = JacobianMat.ajacob(SF['dndx'], 
                                                                   SF['dnde'], nodeXY) 
     B = strainDisp2D.strainDisp2D(SF,nodeXY,Jacob)
+    #print(B)
     return B
