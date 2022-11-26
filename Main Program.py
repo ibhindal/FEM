@@ -17,15 +17,21 @@ import mainmesh
 #############################################
 
 
-filenm = 'CW_P1_Prothesis.m'
+filenm = 'plateHole_linear.vtk'
 
 mesh = meshio.read(filenm) 
 #mesh.msh[quads]
+nelem=[]
+npe=[]
+con_mat= []
+nodeCoor=[]
+nnodes =[]
+ndof =[]
 
 dofpn = 3                               # dof per node
-nelem = mesh.cells['quad'].shape[0]     # number of elements
-npe = mesh.cells['quad'].shape[1]       # nodes per element
-con_mat = mesh.cells['quad']            # connectivity matrix
+nelem = mesh.cells[2].data.shape[0]     # number of elements
+npe = mesh.cells[2].data.shape[1]       # nodes per element
+con_mat = mesh.cells[2]            # connectivity matrix
 nodeCoor = mesh.points                  # node coordinate matrix
 nnodes = mesh.points.shape[0]           # number of nodes
 ndof = nnodes*dofpn                     # total number of dof
