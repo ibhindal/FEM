@@ -12,12 +12,12 @@ import JacobianMat
 import shapefunDeri
 import strainDisp2D
 import mainmesh
-import pandas as pd
+#import pandas as pd
 
 #############################################
 
 
-filenm = 'CW_P1_Prothesis.txt'
+filenm = 'CW_P1_Prothesis.m'
 
 mesh = meshio.read(filenm) 
 #mesh.msh[quads]
