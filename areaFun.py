@@ -15,7 +15,7 @@ qwt : a quadrature integration weights
 Outputs :
 A : area of the quadrangular element
 """
-    nne = xyel.shape[0]
+    nne =xyel.shape[0]
     nquad = qpt.shape[0]
     A = 0.0
     for ii in range(nquad) :
