@@ -59,14 +59,16 @@ for ii in range(nquad) :
 
 shapefundx,shapefunde = [],[]
 jacob = []
-count = 1
+count = -1
 
 
 for i in range(2) :
     for j in range(2) :
-        
-        shapefund= shapefunDeri.shapefunDeri(p[0], p[1])
-        jacob=JacobianMat.ajacob(shapefundx,shapefunde,nodeCoor)
+        count += 1
+        shapefund= shapefunDeri.shapefunDeri(p[0], p[1]) 
+        #jacob=JacobianMat.ajacob(shapefund[0][count],shapefund[1][count],nodeCoor)
+
+
         bfun=B_function.B_function(p[0], p[1])
 
     #ke=ke +np.inv(Bfun) * Ce * bfun

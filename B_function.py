@@ -9,7 +9,7 @@ import strainDisp2D
 
 def B_function(xi, eta):
     xi, eta = 1.,-1. # user-defined local coordinate 
-    N = shapeFun.elem_shape(xi, eta) 
+    N = shapeFun.elem_shape(xi, eta,4) 
     dndx, dnde = shapefunDeri.shapefunDeri(xi, eta) 
     nodeXY = np.array([[0.0, 0.0], 
                         [100.0, 0.0], 
