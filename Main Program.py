@@ -42,7 +42,6 @@ Kel = fl_list['ke']
 """
 
 
-
 p,w = GaussQuad.GaussQuad(2)
 
 qpt=p 
@@ -69,7 +68,10 @@ for i in range(2) :
     for j in range(2) :
         count += 1
         shapefund= shapefunDeri.shapefunDeri(p[0], p[1]) 
-        jacob=JacobianMat.ajacob(shapefund[0][count],shapefund[1][count],nodeCoor)
+        dev=shapefund[1][2]
+        print(dev)
+        #jacob=JacobianMat.ajacob(shapefund[1][count],shapefund[2][count],nodeCoor)
+        #jacob=JacobianMat.ajacob(shapefund[1],shapefund[2],nodeCoor)
         bfun=B_function.B_function(p[0], p[1],nodeCoor)
 
     #ke=ke +np.inv(Bfun) * Ce * bfun
