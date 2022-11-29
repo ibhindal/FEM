@@ -45,16 +45,17 @@ p,w = GaussQuad.GaussQuad(2)
 
 qpt=p 
 qwt=w 
-
+xyel= np.zeros([4,2])
 
 nquad = qpt.shape[0]
 ke = np.zeros([8,8])
+
 for ii in range(nquad) :
     for jj in range(nquad) :
         xi = qpt[ii]
         eta = qpt[jj]
-        dsfdx, dsfde = shapefunDeri.shapefunDeri(xi,eta)
-        #jacobmat, detj = JacobianMat.ajacob(dsfdx, dsfde, xyel)
+        sn,dsfdx, dsfde = shapefunDeri.shapefunDeri(xi,eta)
+        jacobmat, detj = JacobianMat.ajacob(dsfdx, dsfde, xyel)
             
 
 shapefundx,shapefunde = [],[]
@@ -66,7 +67,7 @@ for i in range(2) :
     for j in range(2) :
         count += 1
         shapefund= shapefunDeri.shapefunDeri(p[0], p[1]) 
-        #jacob=JacobianMat.ajacob(shapefund[0][count],shapefund[1][count],nodeCoor)
+        jacob=JacobianMat.ajacob(shapefund[0][count],shapefund[1][count],nodeCoor)
 
 
         bfun=B_function.B_function(p[0], p[1])
