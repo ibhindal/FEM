@@ -70,9 +70,7 @@ for i in range(2) :
         count += 1
         shapefund= shapefunDeri.shapefunDeri(p[0], p[1]) 
         jacob=JacobianMat.ajacob(shapefund[0][count],shapefund[1][count],nodeCoor)
-
-
-        bfun=B_function.B_function(p[0], p[1])
+        bfun=B_function.B_function(p[0], p[1],nodeCoor)
 
     #ke=ke +np.inv(Bfun) * Ce * bfun
   

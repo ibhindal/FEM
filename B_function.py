@@ -1,5 +1,4 @@
 import numpy as np
-import shapeFun
 import shapefunDeri
 import JacobianMat
 import strainDisp2D
@@ -10,7 +9,7 @@ import strainDisp2D
 
 def B_function(xi, eta,nodeXY):
    
-    N, dndx, dnde = shapeFun.elem_shape(xi, eta, 4) 
+    N, dndx, dnde = shapefunDeri.shapefunDeri(xi, eta) 
  
 
     Jacob, SF = {}, {} 
