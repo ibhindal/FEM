@@ -1,7 +1,7 @@
-#  Matlab mesh
-# hipGeom, Created by Gmsh
-#ASCII
-
+%  Matlab mesh
+% hipGeom, Created by Gmsh
+% ASCII
+clear msh;
 msh.nbNod = 3537;
 msh.POS = [
 0 0 0;
