@@ -4,21 +4,14 @@ import shapefunDeri
 import JacobianMat
 import strainDisp2D
 
+#b function is the strain displacement matrix
+#requuires xi, eta and nodal coords
 
 
-
-def B_function(xi, eta):
-    xi, eta = 1.,-1. # user-defined local coordinate 
-    N = shapeFun.elem_shape(xi, eta,4) 
-    dndx, dnde = shapefunDeri.shapefunDeri(xi, eta) 
-    nodeXY = np.array([[0.0, 0.0], 
-                        [100.0, 0.0], 
-                        [100.0, 100.0], 
-                        [0.0, 100.0]]) 
-    uxy = np.array([[0.0, 0.0], 
-                    [0.1, 0.0], 
-                    [0.1,-0.03], 
-                    [0.0,-0.03]]) 
+def B_function(xi, eta,nodeXY):
+   
+    N, dndx, dnde = shapeFun.elem_shape(xi, eta, 4) 
+ 
 
     Jacob, SF = {}, {} 
     SF['sf'], SF['dndx'], SF['dnde'] = N, dndx, dnde 
