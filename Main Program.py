@@ -19,11 +19,11 @@ filenm = 'plateHole_linear.vtk'
 
 mesh = meshio.read(filenm) 
 #mesh.msh[quads]
-nelem=[]
-npe=[]
+nelem=[],[]
+npe=[],[]
 con_mat= []
 nodeCoor=[]
-nnodes =[]
+nnodes =[],[]
 ndof =[]
 
 dofpn = 3                               # dof per node
