@@ -81,7 +81,7 @@ for i in range(2) :
 
 
 
-E = 2e5 
+E = 2.1e11 
 nu = 0.3 
 print(str((E/(1-nu**2))))
 D = E/(1-nu**2)*np.array([[1, nu, 0], [nu, 1, 0], [0, 0, (1-nu)/2]])
