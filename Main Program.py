@@ -41,6 +41,8 @@ fl_list = sp.io.loadmat(flnm)
 Kel = fl_list['ke']
 """
 
+
+
 p,w = GaussQuad.GaussQuad(2)
 
 qpt=p 
@@ -83,5 +85,5 @@ E = 2e5
 nu = 0.3 
 print(str((E/(1-nu**2))))
 D = E/(1-nu**2)*np.array([[1, nu, 0], [nu, 1, 0], [0, 0, (1-nu)/2]])
-strainVec = np.dot(B,uxy.flatten()) 
+strainVec = np.dot(bfun,uxy.flatten()) 
 stressVec = np.dot(D,strainVec) 
