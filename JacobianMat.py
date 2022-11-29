@@ -26,6 +26,7 @@ def ajacob(dndx,dnde,nodecoor) :
     detj = ai[0,0]*ai[1,1]- ai[1,0]*ai[0,1] 
     
     # calculate the inverse of the jacobian 
+    I= np.zeros
     
     if detj == 0 : 
         print("Singular matrix !!!") 

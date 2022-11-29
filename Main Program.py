@@ -55,7 +55,7 @@ for ii in range(nquad) :
         xi = qpt[ii]
         eta = qpt[jj]
         sn,dsfdx, dsfde = shapefunDeri.shapefunDeri(xi,eta)
-        jacobmat, detj = JacobianMat.ajacob(dsfdx, dsfde, xyel)
+        jacobmat, detj, I = JacobianMat.ajacob(dsfdx, dsfde, xyel)
             
 
 shapefundx,shapefunde = [],[]
