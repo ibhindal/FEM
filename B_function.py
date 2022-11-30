@@ -7,9 +7,9 @@ import strainDisp2D
 #requuires xi, eta and nodal coords
 
 
-def B_function(xi, eta,nodeXY):
+def B_function(N, dndx, dnde ,nodeXY):
    
-    N, dndx, dnde = shapefunDeri.shapefunDeri(xi, eta) 
+    #N, dndx, dnde = shapefunDeri.shapefunDeri(xi, eta) 
  
 
     Jacob, SF = {}, {} 
