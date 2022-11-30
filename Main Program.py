@@ -11,30 +11,46 @@ import shapefunDeri
 import strainDisp2D
 import mainmesh
 import assembleSys
+import scipy.io as spio
 #import pandas as pd
+import MeshNodeCoordinates
 from ke import kecalc
 
 
 #############################################
 
 
-filenm = 'plateHole_linear.vtk'
+mat = spio.loadmat('data.mat', squeeze_me=(True))
 
-mesh = meshio.read(filenm) 
+#Assigning variables to the data imported from MATLAB
+globalNodeCoor = mat['nodecoor']
+elemconnect = mat['elemconnect']
+
+#Node coordinates of a 4 noded element. Assumes all elements in the mesh are quadrangular.
+nnodes = globalNodeCoor.shape[0] #Number of nodes 
+nelem = int(nnodes/4) #Number of elements
+elemNodeCoor = np.zeros((nelem,4,2))
+
+for j in range(ne):
+    for i in range(4):
+        for k in range(2):
+            #display(elemNodeCoor[0,i,k])
+            #display(globalNodeCoor[i,k])
+            elemNodeCoor[j,i,k] = globalNodeCoor[i,k]
+
+
+            
 #mesh.msh[quads]
-nelem=[],[]
 npe=[],[]
 con_mat= []
 nodeCoor=[]
-nnodes =[],[]
 ndof =[]
 
 dofpn = 2                               # dof per node
-nelem = mesh.cells[2].data.shape[0]     # number of elements
 npe = mesh.cells[2].data.shape[1]       # nodes per element
 con_mat = mesh.cells[2]                 # connectivity matrix
 nodeCoor = mesh.points                  # node coordinate matrix
-nnodes = mesh.points.shape[0]           # number of nodes
+           # number of nodes
 ndof = nnodes*dofpn                     # total number of dof
 npts=4
 nelmmat=4                               # number of elements per material
