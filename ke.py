@@ -5,7 +5,7 @@ from shapefunDeri import shapefunDeri
 from JacobianMat import ajacob
 from B_function import B_function
 
-def kecalc(npts,D,xyel):
+def kecalc(npts,MatNo,xyel):
     #xyel=np.array([8,2])
     #xyel=np.array([[0,0] ,[0,1], [1,0], [1,1],[1,0], [2,0], [2,1],[1,1]])
     #xyel=np.array([[0,0] ,[0,1], [1,0], [1,1]])
@@ -61,6 +61,6 @@ def kecalc(npts,D,xyel):
             B= B_function(sn, dndx, dnde ,xyel)
             xee=De[0]
             print(xee)
-            ke = ke + B.T.dot(De[0]).dot(B) * detj * wti * wtj
+            ke = ke + B.T.dot(De[MatNo]).dot(B) * detj * wti * wtj
         print('wow!')
-    return ke
+    return ke, De
