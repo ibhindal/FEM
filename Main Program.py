@@ -71,14 +71,13 @@ for i in range(2) :
         dev=shapefund[1][2]
         print(dev)
         #jacob=JacobianMat.ajacob(shapefund[1][count],shapefund[2][count],nodeCoor)
-        #jacob=JacobianMat.ajacob(shapefund[1],shapefund[2],nodeCoor)
+        jacob=JacobianMat.ajacob(shapefund[1],shapefund[2],nodeCoor)
         bfun=B_function.B_function(p[0], p[1],nodeCoor)
 
     #ke=ke +np.inv(Bfun) * Ce * bfun
   
 
     #strainDisp2D.strainDisp2D()
-
 
 
 E = 2.1e11 

@@ -23,7 +23,7 @@ for ii in range(npts) :
         arr1=np.array([[eta-1, 1-eta, 1+eta, -1-eta], [xi-1, -1-xi, 1+xi, 1-xi]])
         print(arr1)
         
-       # [B,detJ]=JBMat(xyel,sdv)
+        
         #ke = ke + B.'*D*B*detJ*wti*wtj
 
     #return ke

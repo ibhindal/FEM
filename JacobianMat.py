@@ -37,5 +37,4 @@ def ajacob(dndx,dnde,nodecoor) :
         I = np.linalg.inv(ai) 
         
         
-        
     return ai, detj, I
