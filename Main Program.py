@@ -50,7 +50,6 @@ dofpn = 2                               # dof per node
 npe = mesh.cells[2].data.shape[1]       # nodes per element
 con_mat = mesh.cells[2]                 # connectivity matrix
 nodeCoor = mesh.points                  # node coordinate matrix
-           # number of nodes
 ndof = nnodes*dofpn                     # total number of dof
 npts=4
 nelmmat=4                               # number of elements per material
