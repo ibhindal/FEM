@@ -25,13 +25,17 @@ nne = globalNodeCoor.shape[0] #Number of nodes
 ne = int(nne/4) #Number of elements
 elemNodeCoor = np.zeros((ne,4,2))
 
+x = -1
+
 for j in range(ne):
     for i in range(4):
+        x = x + 1
         for k in range(2):
-            #display(elemNodeCoor[0,i,k])
-            #display(globalNodeCoor[i,k])
-            elemNodeCoor[j,i,k] = globalNodeCoor[i,k]
-        
+            elemNodeCoor[j,i,k] = globalNodeCoor[x,k]
+   
+    
+            
+       
 
 
 
