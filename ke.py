@@ -2,9 +2,6 @@
 import numpy as np
 from GaussQuad import GaussQuad
 
-
-
-
 #kecalc(npts,D,xyel)
 npts=4
 
