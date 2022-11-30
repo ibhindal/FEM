@@ -31,7 +31,7 @@ nnodes = globalNodeCoor.shape[0] #Number of nodes
 nelem = int(nnodes/4) #Number of elements
 elemNodeCoor = np.zeros((nelem,4,2))
 
-for j in range(ne):
+for j in range(nelem):
     for i in range(4):
         for k in range(2):
             #display(elemNodeCoor[0,i,k])
@@ -39,7 +39,7 @@ for j in range(ne):
             elemNodeCoor[j,i,k] = globalNodeCoor[i,k]
 
 
-            
+
 #mesh.msh[quads]
 npe=[],[]
 con_mat= []
