@@ -28,6 +28,7 @@ for ii in range(npts) :
         sn, dndx, dnde = shapefunDeri(xi, eta)
         ai, detj, I = ajacob(dndx,dnde,xyel)
         B= B_function(sn, dndx, dnde ,xyel)
-        #ke = ke + B.'*D*B*detJ*wti*wtj
+        
+        ke = ke + B.T*D*B*detJ*wti*wtj
 print('wow')
     #return ke
