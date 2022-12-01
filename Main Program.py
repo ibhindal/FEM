@@ -38,7 +38,7 @@ for j in range(nelem):
 
 
 #mesh.msh[quads]
-con_mat=np.array(con_mat)
+con_mat=np.zeros((nelem,4))
 nodeCoor=[]
 ndof =[]
 
@@ -52,7 +52,8 @@ nelmmat=4                               # number of elements per material
 
 for i in range(nelem):
     D=elemconnect[i][4]                         #list of materials for each element
-    #con_mat = np.array(elemconnect[i][0,1,2,3] )# connectivity matrix
+    for j in range(4) :
+        con_mat[i][j] = np.array(elemconnect[i][j] )# connectivity matrix
     nodeCoor = globalNodeCoor[i]                # node coordinate matrix
 
 p,w = GaussQuad.GaussQuad(2)
@@ -60,7 +61,7 @@ p,w = GaussQuad.GaussQuad(2)
 qpt=p 
 qwt=w 
 
-xyel= np.zeros([4,2])
+xyel= np.zeros([4,2])# update this variable
 nquad = qpt.shape[0]
 ke = np.zeros([8,8])
 
@@ -78,7 +79,7 @@ for ii in range(nquad) :
 shapefundx,shapefunde = [],[]
 jacob = []
 count = -1
-Kg=np.zeros(ndof,ndof) #global stiffness matrix
+Kg=np.zeros((ndof,ndof)) #global stiffness matrix
 ElemDistMat= np.zeros([8,ndof]) #Element distribution matrix
 
 for d in range(4):
