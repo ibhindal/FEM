@@ -21,8 +21,6 @@ def strainDisp2D(SF,nodeCoor,Jacob) :
     r2 = np.c_[dsfde,np.zeros(nne)].flatten() 
     R = I.dot(np.c_[r1, r2].T)
 
-
-
     dudx = R[0,:] 
     dudy = R[1,:] 
     r1 = np.c_[np.zeros(nne),dsfdx].flatten()

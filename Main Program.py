@@ -62,7 +62,7 @@ p,w = GaussQuad.GaussQuad(2)
 qpt=p 
 qwt=w 
 
-xyel= np.zeros([4,2])# update this variable
+xyel= np.zeros([4,2]) # update this variable
 nquad = qpt.shape[0]
 ke = np.zeros([8,8])
 
