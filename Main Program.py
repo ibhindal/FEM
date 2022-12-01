@@ -12,6 +12,7 @@ import scipy.io as spio
 #import pandas as pd
 from ke import kecalc
 import matplotlib.pyplot as plt
+from DirichletBC import DirichletBC
 
 
 #############################################
@@ -86,13 +87,18 @@ for d in range(4):
    for e in range(nelmmat):
     
     ElemDistMat= np.zeros([8,ndof]) #Element distrribution matrix
-    ke=kecalc(npts,D,xyel)
+    ke=kecalc(npts,d,xyel)
     con_matrix =con_mat[e,:]
     Kg = assembleSys(Kg,ke,con_matrix) 
 
 
 plt.plot(Kg)          
-              
+
+##### Dirichlet BC (built-in edge y=0) #######
+nodesbc = np.where(nodeCoor[:,1] == 0)[0]   # find the nodes on edge y=0
+dofbc = np.c_[3*nodesbc, 3*nodesbc+1, 3*nodesbc+2].flatten()
+K_bc = DirichletBC(K,dofbc)    # system matrix after boundary conditions
+
 
 #ke=kecalc(npts,D,xyel)
 
