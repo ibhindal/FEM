@@ -2,19 +2,16 @@
 
 import os
 import numpy as np
-import meshio
 import areaFun
-import B_function
 import GaussQuad
 import JacobianMat
 import shapefunDeri
 import strainDisp2D
-import mainmesh
 import assembleSys
 import scipy.io as spio
 #import pandas as pd
-import MeshNodeCoordinates
 from ke import kecalc
+import matplotlib.pyplot as plt
 
 
 #############################################
@@ -41,20 +38,23 @@ for j in range(nelem):
 
 
 #mesh.msh[quads]
-npe=[],[]
 con_mat= []
 nodeCoor=[]
 ndof =[]
 
 dofpn = 2                               # dof per node
-npe = mesh.cells[2].data.shape[1]       # nodes per element
-con_mat = mesh.cells[2]                 # connectivity matrix
-nodeCoor = mesh.points                  # node coordinate matrix
+npe =4                                  # nodes per element     
 ndof = nnodes*dofpn                     # total number of dof
 npts=4
 nelmmat=4                               # number of elements per material
 #element info
-D=1 #change this to bens function
+
+
+
+for i in range(nelem):
+    D=elemconnect[i][4]                         #list of materials for each element
+    #con_mat = np.array(elemconnect[i][0,1,2,3] )# connectivity matrix
+    nodeCoor = globalNodeCoor[i]                # node coordinate matrix
 
 p,w = GaussQuad.GaussQuad(2)
 
@@ -82,12 +82,15 @@ jacob = []
 count = -1
 Kg=np.zeros(ndof,ndof) #global stiffness matrix
 ElemDistMat= np.zeros([8,ndof]) #Element distribution matrix
+
 for d in range(4):
    for e in range(nelmmat):
+    
     ElemDistMat= np.zeros([8,ndof]) #Element distrribution matrix
     ke=kecalc(npts,D,xyel)
     con_matrix =con_mat[e,:]
-    Kg = assembleSys(Kg,ke,con_matrix)            
+    Kg = assembleSys(Kg,ke,con_matrix) 
+    plt.plot(Kg)          
               
 
 #ke=kecalc(npts,D,xyel)
