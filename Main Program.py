@@ -75,7 +75,7 @@ for c in range(nquad):# what we need to do is extract each line from elem connec
         a = elemconnect[c][w]
         bx,by = globalNodeCoor[a-1] 
     
-        xyel[w,0],xyel[w,1] = bx, by
+        xyel[w,0],xyel[w,1] = bx, by# probably would be an idea to stick this in an array instead of putting the whole program in a for loop. i mean either  works...
 
     for ii in range(nquad) :
         for jj in range(nquad) :
