@@ -50,12 +50,12 @@ dofpn = 2                               # dof per node
 npe =4                                  # nodes per element     
 ndof = nnodes*dofpn                     # total number of dof
 npts=4                              
-nelmmat=4                               # number of elements per material
+nelmmat= 1                             # number of elements per material
 #element info
-
+D=np.zeros(nelem)
 
 for i in range(nelem):
-    D=elemconnect[i][4]                         #list of materials for each element
+    D[i]=elemconnect[i][4]                         #list of materials for each element
     for j in range(4) :
         con_mat[i][j] = np.array(elemconnect[i][j] )# connectivity matrix
     nodeCoor = globalNodeCoor[i]                # node coordinate matrix
@@ -68,6 +68,7 @@ xyel= np.zeros([4,2]) # update this variable
 nquad = qpt.shape[0]
 ke = np.zeros([8,8])
 
+Kg=np.zeros((ndof,ndof)) #global stiffness matrix
 
 for c in range(nquad):# what we need to do is extract each line from elem connect and input each number as an index into nodecoor then assign it to the
     for w in range(4):
@@ -87,7 +88,7 @@ for c in range(nquad):# what we need to do is extract each line from elem connec
     shapefundx,shapefunde = [],[]
     jacob = []
     count = -1
-    Kg=np.zeros((ndof,ndof)) #global stiffness matrix
+    
     ElemDistMat= np.zeros([8,ndof]) #Element distribution matrix
 
     for d in range(4):
@@ -107,7 +108,7 @@ dofbc = np.c_[3*nodesbc, 3*nodesbc+1, 3*nodesbc+2].flatten()
 K_bc = DirichletBC(Kg,dofbc)    # system matrix after boundary conditions
 
 
-#ke=kecalc(npts,D,xyel)
+
 
 '''''
 E = 2.1e11 
