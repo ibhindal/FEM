@@ -1,5 +1,6 @@
 import numpy as np
 import scipy as sp
+from scipy import *
 
 
 def strainDisp2D(SF,nodeCoor,Jacob) : 
