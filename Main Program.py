@@ -97,7 +97,7 @@ plt.plot(Kg)
 ##### Dirichlet BC (built-in edge y=0) #######
 nodesbc = np.where(nodeCoor[:,1] == 0)[0]   # find the nodes on edge y=0
 dofbc = np.c_[3*nodesbc, 3*nodesbc+1, 3*nodesbc+2].flatten()
-K_bc = DirichletBC(K,dofbc)    # system matrix after boundary conditions
+K_bc = DirichletBC(Kg,dofbc)    # system matrix after boundary conditions
 
 
 #ke=kecalc(npts,D,xyel)
