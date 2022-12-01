@@ -59,8 +59,6 @@ def kecalc(npts,MatNo,xyel):
             sn, dndx, dnde = shapefunDeri(xi, eta)
             ai, detj, I = ajacob(dndx,dnde,xyel)
             B= B_function(sn, dndx, dnde ,xyel)
-            xee=De[0]
-            print(xee)
             ke = ke + B.T.dot(De[MatNo]).dot(B) * detj * wti * wtj
         print('wow!')
     return ke, De
