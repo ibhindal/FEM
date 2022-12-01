@@ -89,7 +89,7 @@ for d in range(4):
     ElemDistMat= np.zeros([8,ndof]) #Element distrribution matrix
     ke=kecalc(npts,d,xyel)
     con_matrix =con_mat[e,:]
-    Kg = assembleSys(Kg,ke,con_matrix) 
+    Kg = assembleSys(Kg,ke,con_matrix)   
 
 
 plt.plot(Kg)          
