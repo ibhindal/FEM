@@ -89,12 +89,13 @@ for c in range(nquad):# what we need to do is extract each line from elem connec
     jacob = []
     count = -1
     
-    ElemDistMat= np.zeros([8,ndof]) #Element distribution matrix
+    
 
-    for d in range(4):
+    for d in range(4): #this is wrong. need code for all the elements of each material type.- for all elements where D=1, when thats done all where D=2 ...
         for e in range(nelmmat):
         
             ElemDistMat= np.zeros([8,ndof]) #Element distrribution matrix
+            
             ke=kecalc(npts,d,xyel)
             con_matrix =con_mat[e,:]
             Kg = assembleSys(Kg,ke,con_matrix)   
@@ -111,8 +112,7 @@ K_bc = DirichletBC(Kg,dofbc)    # system matrix after boundary conditions
 
 
 '''''
-E = 2.1e11 
-nu = 0.3 
+ 
 print(str((E/(1-nu**2))))
 D = E/(1-nu**2)*np.array([[1, nu, 0], [nu, 1, 0], [0, 0, (1-nu)/2]])
 strainVec = np.dot(bfun,uxy.flatten()) 
