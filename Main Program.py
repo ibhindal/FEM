@@ -38,17 +38,16 @@ for j in range(nelem):
 
 
 #mesh.msh[quads]
-con_mat= []
+con_mat=np.array(con_mat)
 nodeCoor=[]
 ndof =[]
 
 dofpn = 2                               # dof per node
 npe =4                                  # nodes per element     
 ndof = nnodes*dofpn                     # total number of dof
-npts=4
+npts=4                              
 nelmmat=4                               # number of elements per material
 #element info
-
 
 
 for i in range(nelem):
@@ -62,7 +61,6 @@ qpt=p
 qwt=w 
 
 xyel= np.zeros([4,2])
-
 nquad = qpt.shape[0]
 ke = np.zeros([8,8])
 
@@ -90,7 +88,9 @@ for d in range(4):
     ke=kecalc(npts,D,xyel)
     con_matrix =con_mat[e,:]
     Kg = assembleSys(Kg,ke,con_matrix) 
-    plt.plot(Kg)          
+
+
+plt.plot(Kg)          
               
 
 #ke=kecalc(npts,D,xyel)
