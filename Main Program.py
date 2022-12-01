@@ -12,6 +12,7 @@ import scipy.io as spio
 #import pandas as pd
 from ke import kecalc
 import matplotlib.pyplot as plt
+from assembleSys import assembleSys
 from DirichletBC import DirichletBC
 
 
@@ -38,6 +39,8 @@ for j in range(nelem):
 
 
 
+
+
 #mesh.msh[quads]
 con_mat=np.zeros((nelem,4))
 nodeCoor=[]
@@ -58,7 +61,6 @@ for i in range(nelem):
     nodeCoor = globalNodeCoor[i]                # node coordinate matrix
 
 p,w = GaussQuad.GaussQuad(2)
-
 qpt=p 
 qwt=w 
 
@@ -67,29 +69,34 @@ nquad = qpt.shape[0]
 ke = np.zeros([8,8])
 
 
-
-
-for ii in range(nquad) :
-    for jj in range(nquad) :
-        xi = qpt[ii]
-        eta = qpt[jj]
-        sn,dsfdx, dsfde = shapefunDeri.shapefunDeri(xi,eta)
-        jacobmat, detj, I = JacobianMat.ajacob(dsfdx, dsfde, xyel)
-            
-
-shapefundx,shapefunde = [],[]
-jacob = []
-count = -1
-Kg=np.zeros((ndof,ndof)) #global stiffness matrix
-ElemDistMat= np.zeros([8,ndof]) #Element distribution matrix
-
-for d in range(4):
-   for e in range(nelmmat):
+for c in range(nquad):# what we need to do is extract each line from elem connect and input each number as an index into nodecoor then assign it to the
+    for w in range(4):
+        a = elemconnect[c][w]
+        bx,by = globalNodeCoor[a-1] 
     
-    ElemDistMat= np.zeros([8,ndof]) #Element distrribution matrix
-    ke=kecalc(npts,d,xyel)
-    con_matrix =con_mat[e,:]
-    Kg = assembleSys(Kg,ke,con_matrix)   
+        xyel[w,0],xyel[w,1] = bx, by
+
+    for ii in range(nquad) :
+        for jj in range(nquad) :
+            xi = qpt[ii]
+            eta = qpt[jj]
+            sn,dsfdx, dsfde = shapefunDeri.shapefunDeri(xi,eta)
+            jacobmat, detj, I = JacobianMat.ajacob(dsfdx, dsfde, xyel)
+                
+
+    shapefundx,shapefunde = [],[]
+    jacob = []
+    count = -1
+    Kg=np.zeros((ndof,ndof)) #global stiffness matrix
+    ElemDistMat= np.zeros([8,ndof]) #Element distribution matrix
+
+    for d in range(4):
+        for e in range(nelmmat):
+        
+            ElemDistMat= np.zeros([8,ndof]) #Element distrribution matrix
+            ke=kecalc(npts,d,xyel)
+            con_matrix =con_mat[e,:]
+            Kg = assembleSys(Kg,ke,con_matrix)   
 
 
 plt.plot(Kg)          
