@@ -8,9 +8,11 @@ import JacobianMat
 import shapefunDeri
 import strainDisp2D
 import assembleSys
+import scipy as sp
 import scipy.io as spio
 #import pandas as pd
 from ke import kecalc
+import meshio
 import matplotlib.pyplot as plt
 from assembleSys import assembleSys
 from DirichletBC import DirichletBC
@@ -108,6 +110,12 @@ nodesbc = np.where(nodeCoor[:,1] == 0)[0]   # find the nodes on edge y=0
 dofbc = np.c_[3*nodesbc, 3*nodesbc+1, 3*nodesbc+2].flatten()
 K_bc = DirichletBC(Kg,dofbc)    # system matrix after boundary conditions
 
+# Plot the sparsity of the system stiffness matrix
+plt.spy(K_bc, markersize=0.1)
+plt.show()
+flnmfig = "sparsity_K_beforeBC.png"
+plt.savefig(flnmfig)
+
 
 
 
@@ -118,3 +126,25 @@ D = E/(1-nu**2)*np.array([[1, nu, 0], [nu, 1, 0], [0, 0, (1-nu)/2]])
 strainVec = np.dot(bfun,uxy.flatten()) 
 stressVec = np.dot(D,strainVec) 
 '''
+
+
+
+################################################################################
+######## CALCULATING THE EIGENVALUES AND VECTORS OF THE SYSTEM MATRIX ##########
+################################################################################
+nmodes = 6      # number of modes to calculate
+eigVal, eigVec = sp.sparse.linalg.eigsh(K_bc, k=nmodes, which='SM')
+
+
+
+# write the mesh in vtk format for visualization in Paraview (for e.g.)
+meshvtk = meshio.Mesh(nodeCoor, con_matrix)
+
+for ii in range(nmodes) :
+    nm = "eVec%d" %(ii+1)
+    meshvtk.point_data[nm] = np.c_[np.zeros_like(eigVec[::3,ii]),
+                np.zeros_like(eigVec[::3,ii]), eigVec[::3,ii]]
+
+
+#meshvtk.cell_data = con_matrix.cell_data
+meshio.write("linear_Mesh.vtk", meshvtk)
