@@ -23,19 +23,20 @@ from DirichletBC import DirichletBC
 
 mat = spio.loadmat('data.mat', squeeze_me=(True))
 
-#Assigning variables to the data imported from MATLAB
+# Assigning variables to the data imported from MATLAB
 globalNodeCoor = mat['nodecoor']
 elemconnect = mat['elemconnect']
 
-#Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
-nnodes = globalNodeCoor.shape[0] #Number of nodes 
-nelem = int(nnodes/4) #Number of elements
-elemNodeCoor = np.zeros((nelem,4,2)) #Multi dimension
+# Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
+nnodes = globalNodeCoor.shape[0] # Total number of nodes in mesh  
+nelem = int(nnodes/4) # Total number of elements in mesh
+elemNodeCoor = np.zeros((nelem,4,2)) # Array storing xy coordinates of the 4 nodes in an element
 
+# Loops through the globalNodeCoor array and fills elemNodeCoor with the xy coordinates of the nodes
 x = -1
 for j in range(nelem):
     for i in range(4):
-        x = x + 1
+        x += 1
         for k in range(2):
             elemNodeCoor[j,i,k] = globalNodeCoor[x,k]
 
@@ -59,13 +60,13 @@ for i in range(nelem):
         con_mat[i][j] = np.array(elemconnect[i][j] )# connectivity matrix
     nodeCoor = globalNodeCoor[i]                    # node coordinate matrix
 
-p,w = GaussQuad.GaussQuad(2)
+p,w = GaussQuad.GaussQuad(2) #getting values from GaussQuad
 qpt=p 
 qwt=w 
 
 xyel= np.zeros([4,2]) # update this variable
-nquad = qpt.shape[0]
-ke = np.zeros([8,8])
+nquad = qpt.shape[0]  # a matric for the coordinates from gaus quad
+ke = np.zeros([8,8]) #defining the stiffness matrix
 
 Kg=np.zeros((ndof,ndof)) #global stiffness matrix
 
@@ -78,8 +79,8 @@ for c in range(nquad):# what we need to do is extract each line from elem connec
 
     for ii in range(nquad) :
         for jj in range(nquad) :
-            xi = qpt[ii]
-            eta = qpt[jj]
+            xi = qpt[ii]                                                    # Stolen from abishek to calculate the
+            eta = qpt[jj]                                                   # Shapefunction and jacobian
             sn,dsfdx, dsfde = shapefunDeri.shapefunDeri(xi,eta)
             jacobmat, detj, I = JacobianMat.ajacob(dsfdx, dsfde, xyel)
                 
@@ -94,7 +95,7 @@ for c in range(nquad):# what we need to do is extract each line from elem connec
         
             ElemDistMat= np.zeros([8,ndof]) #Element distrribution matrix
             
-            ke=kecalc(npts,d,xyel) 
+            ke,dee=kecalc(npts,d,xyel) 
             con_matrix =con_mat[e,:]
             Kg = assembleSys(Kg,ke,con_matrix)   
 
