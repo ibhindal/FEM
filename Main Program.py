@@ -40,9 +40,6 @@ for j in range(nelem):
             elemNodeCoor[j,i,k] = globalNodeCoor[i,k]
 
 
-
-
-
 #mesh.msh[quads]
 con_mat=np.zeros((nelem,4))
 nodeCoor=[]
@@ -91,7 +88,6 @@ for c in range(nquad):# what we need to do is extract each line from elem connec
     jacob = []
     count = -1
     
-    
 
     for d in range(4): #this is wrong. need code for all the elements of each material type.- for all elements where D=1, when thats done all where D=2 ...
         for e in range(nelmmat):
@@ -117,9 +113,7 @@ flnmfig = "sparsity_K_beforeBC.png"
 plt.savefig(flnmfig)
 
 
-
-
-'''''
+'''
  
 print(str((E/(1-nu**2))))
 D = E/(1-nu**2)*np.array([[1, nu, 0], [nu, 1, 0], [0, 0, (1-nu)/2]])
@@ -128,11 +122,10 @@ stressVec = np.dot(D,strainVec)
 '''
 
 
-
 ################################################################################
 ######## CALCULATING THE EIGENVALUES AND VECTORS OF THE SYSTEM MATRIX ##########
 ################################################################################
-nmodes = 6      # number of modes to calculate
+nmodes = 6      # number of modes to calculate~did he mean nodes or is modes correct?
 eigVal, eigVec = sp.sparse.linalg.eigsh(K_bc, k=nmodes, which='SM')
 
 
