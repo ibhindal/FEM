@@ -64,11 +64,11 @@ p,w = GaussQuad.GaussQuad(2) #getting values from GaussQuad
 qpt=p 
 qwt=w 
 
-xyel= np.zeros([4,2]) # update this variable
+xyel= np.zeros([4,2]) # update this variable. Replace with xyel = elemNodeCoor[j,:,:]? Where j is the element in reference
 nquad = qpt.shape[0]  # a matric for the coordinates from gaus quad
-ke = np.zeros([8,8]) #defining the stiffness matrix
+ke = np.zeros([8,8]) # Defining the local stiffness matrix
 
-Kg=np.zeros((ndof,ndof)) #global stiffness matrix
+Kg=np.zeros((ndof,ndof)) #Defining the global stiffness matrix
 
 for c in range(nquad):# what we need to do is extract each line from elem connect and input each number as an index into nodecoor then assign it to the
     for w in range(4):
@@ -90,14 +90,12 @@ for c in range(nquad):# what we need to do is extract each line from elem connec
     count = -1
     
 
-    for d in range(4): #this is wrong. need code for all the elements of each material type.- for all elements where D=1, when thats done all where D=2 ...
-        for e in range(nelmmat):
+    for D in range(nelmmat):
         
-            ElemDistMat= np.zeros([8,ndof]) #Element distrribution matrix
-            
-            ke,dee=kecalc(npts,d,xyel) 
-            con_matrix =con_mat[e,:]
-            Kg = assembleSys(Kg,ke,con_matrix)   
+        ElemDistMat= np.zeros([8,ndof]) #Element distrribution matrix
+        ke,dee=kecalc(npts,D,xyel) 
+        con_matrix =con_mat[e,:]
+        Kg = assembleSys(Kg,ke,con_matrix)   
 
 
 plt.plot(Kg)          

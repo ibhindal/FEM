@@ -33,14 +33,6 @@ def GaussQuad(npts) :
         weit[2], weit[3] = weit[1], weit[0]
         return point, weit
 
-    
-    if npts == 6 :
-        point[0], point[2], point[4] = 0.2386191861, 0.6612093865, 0.9324695142
-        point[1], point[3], point[5] = -point[0], -point[2], -point[4]
-        weit[0], weit[2], weit[4] = 0.4679139346, 0.3607615730, 0.1713244924
-        weit[1], weit[3], weit[5] = weit[0], weit[2], weit[4]
-        return point, weit
-
     return point, weit          #error case returns vectors populated with 0's
 
 
