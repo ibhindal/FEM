@@ -28,13 +28,13 @@ def kecalc(npts,MatNo,xyel):
 
     Mat_prop=[[E_head,nu_head],[E_stem,nu_stem],[E_cortical,nu_cortical],[E_trebecular,nu_trebecular],[E_marrow,nu_marrow]]
 
-    def dmat(val):
-        E=val[0]
-        v= val[1]
-        dmat=E/((1-v)**2) * np.array([[1, v, 0],
-                                    [v, 1, 0], 
-                                    [0, 0,((1-v)/2)]])
-        return dmat
+    dmat(val):
+    E=val[0]
+    v= val[1]
+    dmat=E/((1-v)**2) * np.array([[1, v, 0],
+                                [v, 1, 0], 
+                                [0, 0,((1-v)/2)]])
+    
 
 
 
