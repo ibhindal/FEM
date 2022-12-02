@@ -26,7 +26,7 @@ def kecalc(npts,MatNo,xyel):
     #Mat_prop = [[E_head,nu_head],[E_stem,nu_stem],[E_cortical,nu_cortical],[E_trebecular,nu_trebecular],[E_marrow,nu_marrow]]
     
     Mat_Prop_Dict = {"Head" : [E_head, nu_head], "Stem" : [E_stem, nu_stem], "Cortical":[E_cortical,nu_cortical], "Trebecular":[E_trebecular,nu_trebecular], "Marrow":[E_marrow,nu_marrow]}
-    Material = {1 : "Head", 2 : "Stem", 3 : "Cortical", 4 : "Trebecular", 5 : "Marrow"}
+    Material = {0 : "Head", 1 : "Stem", 2 : "Cortical", 3 : "Trebecular", 4 : "Marrow"}
     
     E = Mat_Prop_Dict[Material[MatNo]][0]
     v = Mat_Prop_Dict[Material[MatNo]][1]

@@ -91,7 +91,7 @@ for c in range(nquad):# what we need to do is extract each line from elem connec
     
 
     for D in range(nelmmat):
-        
+        for e in range(8) : # 8 is a random number
         ElemDistMat= np.zeros([8,ndof]) #Element distrribution matrix
         ke,dee=kecalc(npts,D,xyel) 
         con_matrix =con_mat[e,:]
