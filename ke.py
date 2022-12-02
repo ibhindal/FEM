@@ -11,6 +11,7 @@ def kecalc(npts,MatNo,xyel):
     
     point, weit = GaussQuad(npts)
 
+# Young's Modulus and Poission's Ratio for different materials 
     E_head=2.1e11
     nu_head=0.3
     E_stem=1.14e11
@@ -22,22 +23,24 @@ def kecalc(npts,MatNo,xyel):
     E_marrow=3e8
     nu_marrow=0.45
 
-    Mat_prop = [[E_head,nu_head],[E_stem,nu_stem],[E_cortical,nu_cortical],[E_trebecular,nu_trebecular],[E_marrow,nu_marrow]]
+    #Mat_prop = [[E_head,nu_head],[E_stem,nu_stem],[E_cortical,nu_cortical],[E_trebecular,nu_trebecular],[E_marrow,nu_marrow]]
     
     Mat_Prop_Dict = {"Head" : [E_head, nu_head], "Stem" : [E_stem, nu_stem], "Cortical":[E_cortical,nu_cortical], "Trebecular":[E_trebecular,nu_trebecular], "Marrow":[E_marrow,nu_marrow]}
     Material = {1 : "Head", 2 : "Stem", 3 : "Cortical", 4 : "Trebecular", 5 : "Marrow"}
     
-    M = 1
-    E = Mat_Prop_Dict[Material[M]][0]
-    v = Mat_Prop_Dict[Material[M]][1]
+    E = Mat_Prop_Dict[Material[MatNo]][0]
+    v = Mat_Prop_Dict[Material[MatNo]][1]
+    val = (E, v)
 
     dmat=E/((1-v)**2) * np.array([[1, v, 0],
                                 [v, 1, 0], 
                                 [0, 0,((1-v)/2)]])
     
     D = {}
-    for i, val in enumerate(Mat_prop):
-        D[i] = dmat(val)
+    #for i in enumerate(Mat_Prop):
+    #    D[i] = dmat
+    
+    D[0] = dmat
 
     ke= np.zeros([8,8])
 
