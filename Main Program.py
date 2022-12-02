@@ -27,17 +27,17 @@ mat = spio.loadmat('data.mat', squeeze_me=(True))
 globalNodeCoor = mat['nodecoor']
 elemconnect = mat['elemconnect']
 
-#Node coordinates of a 4 noded element. Assumes all elements in the mesh are quadrangular.
+#Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
 nnodes = globalNodeCoor.shape[0] #Number of nodes 
 nelem = int(nnodes/4) #Number of elements
-elemNodeCoor = np.zeros((nelem,4,2))
+elemNodeCoor = np.zeros((nelem,4,2)) #Multi dimension
 
+x = -1
 for j in range(nelem):
     for i in range(4):
+        x = x + 1
         for k in range(2):
-            #display(elemNodeCoor[0,i,k])
-            #display(globalNodeCoor[i,k])
-            elemNodeCoor[j,i,k] = globalNodeCoor[i,k]
+            elemNodeCoor[j,i,k] = globalNodeCoor[x,k]
 
 
 #mesh.msh[quads]
@@ -94,7 +94,7 @@ for c in range(nquad):# what we need to do is extract each line from elem connec
         
             ElemDistMat= np.zeros([8,ndof]) #Element distrribution matrix
             
-            ke=kecalc(npts,d,xyel)
+            ke=kecalc(npts,d,xyel) 
             con_matrix =con_mat[e,:]
             Kg = assembleSys(Kg,ke,con_matrix)   
 

@@ -5,15 +5,10 @@ from shapefunDeri import shapefunDeri
 from JacobianMat import ajacob
 from B_function import B_function
 
+
 def kecalc(npts,MatNo,xyel):
-    #xyel=np.array([8,2])
-    #xyel=np.array([[0,0] ,[0,1], [1,0], [1,1],[1,0], [2,0], [2,1],[1,1]])
-    #xyel=np.array([[0,0] ,[0,1], [1,0], [1,1]])
-    #npts=4
-
+    
     point, weit = GaussQuad(npts)
-
-
 
     E_head=2.1e11
     nu_head=0.3
@@ -28,7 +23,6 @@ def kecalc(npts,MatNo,xyel):
 
     Mat_prop=[[E_head,nu_head],[E_stem,nu_stem],[E_cortical,nu_cortical],[E_trebecular,nu_trebecular],[E_marrow,nu_marrow]]
 
-    dmat(val):
     E=val[0]
     v= val[1]
     dmat=E/((1-v)**2) * np.array([[1, v, 0],
@@ -38,9 +32,9 @@ def kecalc(npts,MatNo,xyel):
 
 
 
-    De = {}
+    D = {}
     for i, val in enumerate(Mat_prop):
-        De[i] = dmat(val)
+        D[i] = dmat(val)
 
 
 
@@ -59,6 +53,6 @@ def kecalc(npts,MatNo,xyel):
             sn, dndx, dnde = shapefunDeri(xi, eta)
             ai, detj, I = ajacob(dndx,dnde,xyel)
             B= B_function(sn, dndx, dnde ,xyel)
-            ke = ke + B.T.dot(De[MatNo]).dot(B) * detj * wti * wtj
-        print('wow!')
-    return ke, De
+            ke = ke + B.T.dot(D[MatNo]).dot(B) * detj * wti * wtj
+        print('KeCalc - Completed!')
+    return ke, D
