@@ -104,7 +104,8 @@ for i in range(nquad) :                            # for each points' connection
 shapefundx,shapefunde = [],[]
 jacob = []
 count = -1
-D     = np.zeros(nelem)                             # D matrix, in tensor form, a (1 x nelem) matrix   
+D     = np.zeros(nelem)                             # D matrix, in tensor form, a (1 x nelem) matrix 
+#D = np.zeros(nnodes*3, nnodes*3)  #isaac:i think it should be this
 
 for MatNo in range(5):                              # for each material, removed nelmmat as it is equal to 1
     for i in range(nelem) :                         # for each element                  
