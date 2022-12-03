@@ -37,12 +37,12 @@ for j in range(nelem):                  #for each element
             elemNodeCoor[j,i,k] = globalNodeCoor[j*4 + i,k]
 
 #initialising variables and constants 
-dofpn    = 2                             # dof per node
-npe      = 4                             # nodes per element  
-npts     = 4                             # number of points per element
+dofpn    = 2                             # dof per node, x co-or and y co-or
+npe      = npts = 4                      # nodes per element  
+                                         # number of points per element
 ndof     = nnodes*dofpn                  # total number of dof
 nodeCoor = []                            # node coordinate, holding value for the current node                             
-nelmmat  = 1                            #edit this # number of elements per material
+
 
 # Young's Modulus and Poission's Ratio for different materials 
 E_head        = 2.1e11
@@ -57,16 +57,19 @@ E_marrow      = 3e8
 nu_marrow     = 0.45
 Mat_Prop_Dict = {"Head" : [E_head, nu_head], "Stem" : [E_stem, nu_stem], "Cortical":[E_cortical,nu_cortical], "Trebecular":[E_trebecular,nu_trebecular], "Marrow":[E_marrow,nu_marrow]}
 Material      = {0 : "Head", 1 : "Stem", 2 : "Cortical", 3 : "Trebecular", 4 : "Marrow"}
-    
+nelmmat       = []                     # number of elements per material
+
 # initializes sizes
-D        = np.zeros(nelem)                          # D matrix, a (1 x nelem) matrix   
-con_mat  = np.zeros((nelem,4))                      # connectivity matrix, matrix to associate nodes to belong to an element
+D              = np.zeros(nelem)                    # D matrix, a (1 x nelem) matrix   
+con_mat        = np.zeros((nelem,4))                # connectivity matrix, matrix to associate nodes to belong to an element
+MaterialforElm = np.zeros(nelem)                    # materials for each element, follows key of Matrial dictionary
 
 # Connectivity Matrix and Element Material Matrix population
 for i in range(nelem):                              # for each element
-    D[i] = elemconnect[i][4]                        # materials for current element appended in the D matrix, follows key of Matrial dictionary
+    
+    MaterialforElm[i] = elemconnect[i][4]           
     for j in range(4) :                             # for each node in the element
-        con_mat[i][j] = np.array(elemconnect[i][j]) # connectivity matrix
+        con_mat[i][j] = np.array(elemconnect[i][j]) # connectivity matrix #check this
     #nodeCoor = globalNodeCoor[i]                    
 
 #Gauss Quadrature points & weights of a Corner (npts=2)
@@ -112,8 +115,8 @@ for c in range(nquad):                              # for each points' connectio
         """8 is a random number"""
         for e in range(8) :                             # for (???)                  
             ElemDistMat = np.zeros([8,ndof])            # Element distribution matrix
-            E = Mat_Prop_Dict[Material[MatNo]][0]       # Youngs modulus of current material
-            v = Mat_Prop_Dict[Material[MatNo]][1]       # Poissions ration of current material
+            E = Mat_Prop_Dict[MaterialforElm[Material[MatNo]]][0]       # Youngs modulus of current material
+            v = Mat_Prop_Dict[MaterialforElm[Material[MatNo]][1]       # Poissions ration of current material
             ke, D = kecalc(npts,E,v,xyel)               # calculates the element siffness matrix
                                                         # ke: 
                                                         # D :
