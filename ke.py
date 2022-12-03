@@ -1,62 +1,44 @@
-#this is to calculate the ke 
 import numpy as np
 from GaussQuad import GaussQuad
 from shapefunDeri import shapefunDeri
 from JacobianMat import ajacob
 from B_function import B_function
 
-# Function for calculating the element siffness matrix 
-
-def kecalc(npts,MatNo,xyel):
+def kecalc(npts,E,v,xyel):
+    """
+    Function for calculating the element siffness matrix
     
+    Input 
+        npts: number of points of the element
+        E: Youngs modulus
+        v: poissions ratio
+        xyel: coordinates of element points
+    Output
+        ke: 
+        D:
+     """
+      
     point, weit = GaussQuad(npts)
-
-# Young's Modulus and Poission's Ratio for different materials 
-    E_head=2.1e11
-    nu_head=0.3
-    E_stem=1.14e11
-    nu_stem=0.3
-    E_cortical=1.6e10
-    nu_cortical=0.3
-    E_trebecular=1e9
-    nu_trebecular=0.3
-    E_marrow=3e8
-    nu_marrow=0.45
-
-    #Mat_prop = [[E_head,nu_head],[E_stem,nu_stem],[E_cortical,nu_cortical],[E_trebecular,nu_trebecular],[E_marrow,nu_marrow]]
-    
-    Mat_Prop_Dict = {"Head" : [E_head, nu_head], "Stem" : [E_stem, nu_stem], "Cortical":[E_cortical,nu_cortical], "Trebecular":[E_trebecular,nu_trebecular], "Marrow":[E_marrow,nu_marrow]}
-    Material = {0 : "Head", 1 : "Stem", 2 : "Cortical", 3 : "Trebecular", 4 : "Marrow"}
-    
-    E = Mat_Prop_Dict[Material[MatNo]][0]
-    v = Mat_Prop_Dict[Material[MatNo]][1]
-    val = (E, v)
-
-    dmat=E/((1-v)**2) * np.array([[1, v, 0],
-                                [v, 1, 0], 
-                                [0, 0,((1-v)/2)]])
+    dmat        = E/((1-v)**2) * np.array([[1, v, 0],[v, 1, 0],[0, 0,((1-v)/2)]])
     
     D = {}
-    #for i in enumerate(Mat_Prop):
-    #    D[i] = dmat
-    
-    D[0] = dmat
+    for i in range(npts):          #for each material make a D matrix calculation
+        D[i] = dmat
 
-    ke= np.zeros([8,8])
-
-    count=0
+    ke = np.zeros([8,8])
+    count = 0
 
     for ii in range(npts) :
         for jj in range(npts):
-            count+=1
+            count += 1
             #print(count)
-            xi = point[ii]
+            xi  = point[ii]
             eta = point[jj]
             wti = weit[ii]
             wtj = weit[jj]
             sn, dndx, dnde = shapefunDeri(xi, eta)
-            ai, detj, I = ajacob(dndx,dnde,xyel)
-            B= B_function(sn, dndx, dnde ,xyel)
-            ke = ke + B.T.dot(D[MatNo]).dot(B) * detj * wti * wtj
+            ai, detj, I    = ajacob(dndx,dnde,xyel)
+            B  = B_function(sn, dndx, dnde ,xyel)
+            ke = ke + B.T.dot(D[ii]).dot(B) * detj * wti * wtj
         print('KeCalc - Completed!')
     return ke, D
