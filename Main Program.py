@@ -35,7 +35,7 @@ for j in range(nelem):                                                  # for ea
     for i in range(4):                                                  # for each node in each element
         for k in range(2):                                              # for x and y coordinates 
             node = elemconnect[j,i]                                     # Get the elements i(th) connection node
-            node_x, node_y = globalNodeCoor[node, :]            # Get the global co-ordinates of the node
+            node_x, node_y = globalNodeCoor[node, :]                    # Get the global co-ordinates of the node
             elemNodeCoor[j,i,0],elemNodeCoor[j,i,1] = node_x, node_y    # Store the nodes co-ordinates with respect to the element
 
 #initialising variables and constants 
