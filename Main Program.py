@@ -38,8 +38,7 @@ for j in range(nelem):                  #for each element
 
 #initialising variables and constants 
 dofpn    = 2                             # dof per node, x co-or and y co-or
-npe      = npts = 4                      # nodes per element  
-                                         # number of points per element
+npe      = npts = 4                      # nodes per element  # number of points per element
 ndof     = nnodes*dofpn                  # total number of dof
 nodeCoor = []                            # node coordinate, holding value for the current node                             
 
@@ -82,6 +81,7 @@ Kg    = np.zeros((ndof,ndof))                       # global stiffness matrix
 xyel  = np.zeros([4,2])                             # x y coordinnate matrix for the current element, node coordinate matrix (nne X 2)
 #xyels = np.zeros([(4*nquad),2])                    # x y coordinates for all elements
 xyels=[]
+
 for c in range(nquad):                              # for each points' connection
     for w in range(4):                              # for each point
         a = elemconnect[c][w]                       # get the connectivity of that point
@@ -108,8 +108,8 @@ jacob = []
 count = -1
 D     = np.zeros(nelem)                             # D matrix, in tensor form, a (1 x nelem) matrix   
 
-for MatNo in range(5):                              #for each material, removed nelmmat as it is equal to 1
-    for e in range(nelem) :                         # for (???)                  
+for MatNo in range(5):                              # for each material, removed nelmmat as it is equal to 1
+    for e in range(nelem) :                         # for each element                  
         #ElemDistMat = np.zeros([8,ndof])           # Element distribution matrix
         E = Mat_Prop_Dict[Material[MatNo]][0]       # Youngs modulus of current material
         v = Mat_Prop_Dict[Material[MatNo]][1]       # Poissions ration of current material
