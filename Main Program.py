@@ -79,7 +79,7 @@ nquad = qpt.shape[0]                                # Shape of the points return
 ke    = np.zeros([8,8])                             # local stiffness matrix
 Kg    = np.zeros((ndof,ndof))                       # global stiffness matrix
 xyel  = np.zeros([4,2])                             # x y coordinnate matrix for the current element, node coordinate matrix (nne X 2)
-#xyels = np.zeros([(4*nquad),2])                    # x y coordinates for all elements
+#xyels = np.zeros([nelem,4,2])                      # x y coordinates for all elements
 xyels=[]
 
 for c in range(nquad):                              # for each points' connection
@@ -87,12 +87,12 @@ for c in range(nquad):                              # for each points' connectio
         a = elemconnect[c][w]                       # get the connectivity of that point
         bx, by = globalNodeCoor[a]                  # get the co-ordinates of the point
         xyel[w,0],xyel[w,1] = bx, by                # store the co-ordinates of the point
-    #xyels[n, :] = xyel                             # array of xyel
+    #xyels[nelem, :, :] = xyel                      # array of xyel
     xyels.append(xyel)
 
-for ii in range(nquad) :                        # for each points' connection
-    for jj in range(nquad) :                    # for each points' connection
-        xi = qpt[ii]                            # xi, eta : local parametric coordinates
+for ii in range(nquad) :                            # for each points' connection
+    for jj in range(nquad) :                        # for each points' connection
+        xi = qpt[ii]                                # xi, eta : local parametric coordinates
         eta = qpt[jj]                            
         sn,dsfdx, dsfde = shapefunDeri.shapefunDeri(xi,eta) #Calculate the derivative of the shape function for a 2D linear quadrangular element with respect to local parametric coordinates xi and eta
                                                             #  sn   : 
