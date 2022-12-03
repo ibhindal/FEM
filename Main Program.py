@@ -31,10 +31,12 @@ elemNodeCoor = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded element.
                                         # Array storing xy coordinates of the 4 nodes in an element
 
 # Loops through the globalNodeCoor array and populates elemNodeCoor with the xy coordinates of each node
-for j in range(nelem):                  #for each element
-    for i in range(4):                  #for each node in each element
-        for k in range(2):              #for x and y coordinates 
-            elemNodeCoor[j,i,k] = globalNodeCoor[j*4 + i,k]
+for j in range(nelem):                                                  #for each element
+    for i in range(4):                                                  #for each node in each element
+        for k in range(2):                                              #for x and y coordinates 
+            node = elemconnect[j,i]                                     #Get the elements i(th) connection node
+            node_x, node_y, node_z = globalNodeCoor[node, :]            #Get the global co-ordinates of the node
+            elemNodeCoor[j,i,0],elemNodeCoor[j,i,1] = node_x, node_y    #Store the nodes co-ordinates with respect to the element
 
 #initialising variables and constants 
 dofpn    = 2                             # dof per node, x co-or and y co-or
@@ -79,16 +81,14 @@ nquad = qpt.shape[0]                                # Shape of the points return
 ke    = np.zeros([8,8])                             # local stiffness matrix
 Kg    = np.zeros((ndof,ndof))                       # global stiffness matrix
 xyel  = np.zeros([4,2])                             # x y coordinnate matrix for the current element, node coordinate matrix (nne X 2)
-#xyels = np.zeros([nelem,4,2])                      # x y coordinates for all elements
-xyels=[]
+xyels = np.zeros([nelem,4,2])                      # x y coordinates for all elements
 
 for c in range(nquad):                              # for each points' connection
     for w in range(4):                              # for each point
         a = elemconnect[c][w]                       # get the connectivity of that point
         bx, by = globalNodeCoor[a]                  # get the co-ordinates of the point
         xyel[w,0],xyel[w,1] = bx, by                # store the co-ordinates of the point
-    #xyels[nelem, :, :] = xyel                      # array of xyel
-    xyels.append(xyel)
+    xyels[nelem, :, :] = xyel                       # array of xyel
 
 for ii in range(nquad) :                            # for each points' connection
     for jj in range(nquad) :                        # for each points' connection
@@ -138,7 +138,7 @@ plt.savefig(flnmfig)
 print(str((E/(1-nu**2))))
 D = E/(1-nu**2)*np.array([[1, nu, 0], [nu, 1, 0], [0, 0, (1-nu)/2]])
 strainVec = np.dot(bfun,uxy.flatten()) 
-stressVec = np.dot(D,strainVec) #jjj
+stressVec = np.dot(D,strainVec) 
 '''
 
 
