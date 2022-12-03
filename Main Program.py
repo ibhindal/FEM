@@ -60,7 +60,6 @@ Material      = {0 : "Head", 1 : "Stem", 2 : "Cortical", 3 : "Trebecular", 4 : "
 nelmmat       = []                     # number of elements per material
 
 # initializes sizes
-D              = np.zeros(nelem)                    # D matrix, a (1 x nelem) matrix   
 con_mat        = np.zeros((nelem,4))                # connectivity matrix, matrix to associate nodes to belong to an element
 MaterialforElm = np.zeros(nelem)                    # materials for each element, follows key of Matrial dictionary
 
@@ -83,7 +82,7 @@ nquad = qpt.shape[0]                                # Shape of the points return
 ke = np.zeros([8,8])                                # local stiffness matrix
 
 Kg=np.zeros((ndof,ndof))                            # global stiffness matrix
-
+xyels=np.zeros([(4*nquad),2])
 """what we need to do is extract each line from elem connect and input each number as an index into nodecoor then assign it to the"""
 """Whatever this code is, I think it is wrong, are my comments right? i can change this to work if so """
 #yes please do. these comments are  correct.
@@ -92,36 +91,42 @@ for c in range(nquad):                              # for each points' connectio
         a = elemconnect[c][w]                       # get the connectivity of that point
         bx, by = globalNodeCoor[a]                  # get the co-ordinates of the point
         xyel[w,0],xyel[w,1] = bx, by                # store the co-ordinates of the point
+    xyels[c] = xyel                                 #array of xyel
 
-    for ii in range(nquad) :                        # for each points' connection
-        for jj in range(nquad) :                    # for each points' connection
-            xi = qpt[ii]                            # xi, eta : local parametric coordinates
-            eta = qpt[jj]                            
-            sn,dsfdx, dsfde = shapefunDeri.shapefunDeri(xi,eta) #Calculate the derivative of the shape function for a 2D linear quadrangular element with respect to local parametric coordinates xi and eta
-                                                                #  sn   : 
-                                                                #  dsfdx : vector of shape function derivates w.r.t xi dsfde 
-                                                                #  dsfde : vector of shape function derivates w.r.t eta 
-            jacobmat, detj, I = JacobianMat.ajacob(dsfdx, dsfde, xyel) # calculates Jacobian at the local coordinate point (xi,eta)
-                                                                       # jacobmat : the Jacobian matrix (2 by 2) 
-                                                                       # detj     : the determinant of the Jacobian matrix
+#elemNodeCoor  # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
+#xyel the node coordinates of a single element
+#xyels the node coordinates of every 4 no
 
-    #initilizes variables            
-    shapefundx,shapefunde = [],[]
-    jacob = []
-    count = -1
-        
-    for MatNo in range(5):                              #for each material, removed nelmmat as it is equal to 1
-        """nelmmat"""                    
-        """8 is a random number"""
-        for e in range(8) :                             # for (???)                  
-            ElemDistMat = np.zeros([8,ndof])            # Element distribution matrix
-            E = Mat_Prop_Dict[MaterialforElm[Material[MatNo]]][0]       # Youngs modulus of current material
-            v = Mat_Prop_Dict[MaterialforElm[Material[MatNo]][1]       # Poissions ration of current material
-            ke, D = kecalc(npts,E,v,xyel)               # calculates the element siffness matrix
-                                                        # ke: 
-                                                        # D :
-            con_matrix = con_mat[e,:]
-            Kg = assembleSys(Kg,ke,con_matrix)   
+for ii in range(nquad) :                        # for each points' connection
+    for jj in range(nquad) :                    # for each points' connection
+        xi = qpt[ii]                            # xi, eta : local parametric coordinates
+        eta = qpt[jj]                            
+        sn,dsfdx, dsfde = shapefunDeri.shapefunDeri(xi,eta) #Calculate the derivative of the shape function for a 2D linear quadrangular element with respect to local parametric coordinates xi and eta
+                                                            #  sn   : 
+                                                            #  dsfdx : vector of shape function derivates w.r.t xi dsfde 
+                                                            #  dsfde : vector of shape function derivates w.r.t eta 
+        jacobmat, detj, I = JacobianMat.ajacob(dsfdx, dsfde, xyel) # calculates Jacobian at the local coordinate point (xi,eta)
+                                                                    # jacobmat : the Jacobian matrix (2 by 2) 
+                                                                    # detj     : the determinant of the Jacobian matrix
+
+#initilizes variables            
+shapefundx,shapefunde = [],[]
+jacob = []
+count = -1
+D     = np.zeros(nelem)                             # D matrix, in tensor form, a (1 x nelem) matrix   
+
+for MatNo in range(5):                              #for each material, removed nelmmat as it is equal to 1
+    """nelmmat"""                    
+    """8 is a random number"""
+    for e in range(nelem) :                             # for (???)                  
+        #ElemDistMat = np.zeros([8,ndof])            # Element distribution matrix
+        E = Mat_Prop_Dict[Material[MatNo]][0]       # Youngs modulus of current material
+        v = Mat_Prop_Dict[Material[MatNo]][1]       # Poissions ration of current material
+        ke, D[e] = kecalc(npts,E,v,xyels[e])        # calculates the element siffness matrix
+                                                    # ke: 
+                                                    # D :
+        con_matrix = con_mat[e,:]
+        Kg = assembleSys(Kg,ke,con_matrix)   
 
 
 plt.plot(Kg)          
