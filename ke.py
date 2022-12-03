@@ -6,16 +6,16 @@ from B_function import B_function
 
 def kecalc(npts,E,v,xyel):
     """
-    Function for calculating the element siffness matrix
-    
+    Function for calculating the element siffness matrix for an element
+
     Input 
         npts: number of points of the element
         E: Youngs modulus
         v: poissions ratio
         xyel: coordinates of element points (4x2 matrix)
     Output
-        ke:  
-        D: tensor stiffness matrix
+        ke: elastic stiffness matrix
+        D: stiffness matrix
      """
       
     point, weit = GaussQuad(npts)
@@ -29,18 +29,16 @@ def kecalc(npts,E,v,xyel):
     ke = np.zeros([8,8])
     count = 0
 
-    for ii in range(npts) :
-        for jj in range(npts):
-            count += 1
-            #print(count)
-            xi  = point[ii]
-            eta = point[jj]
-            wti = weit[ii]
-            wtj = weit[jj]
-            sn, dndx, dnde = shapefunDeri(xi, eta)
-            ai, detj, I    = ajacob(dndx,dnde,xyel)
-            B  = B_function(sn, dndx, dnde ,xyel)
-            B  = np.array(B)
-            ke = ke + B.T.dot(D[ii]).dot(B) * detj * wti * wtj
+    for i in range(npts) :                                      # for number of points in element
+        for j in range(npts):                                   # for number of points in element
+            count += 1                                           
+            xi  = point[i]
+            eta = point[j]
+            wti = weit[i]
+            wtj = weit[j]
+            sn, dndx, dnde = shapefunDeri(xi, eta)              # the shape function from point i to point j
+            ai, detj, I    = ajacob(dndx,dnde,xyel)             # the jacobian from point i to point j
+            B  = B_function(sn, dndx, dnde ,xyel)               # the B matrix from point i to point j
+            ke = ke + B.T.dot(D[i]).dot(B) * detj * wti * wtj   # elastic stiffness matrix, square matrix
         print('KeCalc - Completed!')
     return ke, D

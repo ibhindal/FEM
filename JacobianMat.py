@@ -8,8 +8,8 @@ def ajacob(dndx,dnde,nodecoor) :
     """ 
     calculates Jacobian at the local coordinate point (xi,eta) 
     Inputs : 
-        dndx : vector derivatives of shape functions w.r.t xi (1 by nne) 
-        dnde : vector derivatives of shape functions w.r.t eta (1 by nne) 
+        dndx : vector derivatives of shape functions w.r.t xi (nne by 1) 
+        dnde : vector derivatives of shape functions w.r.t eta (nne by 1) 
         nodecoor : node coordinate matrix (nne X 2) 
     
     Returns : 
@@ -19,8 +19,6 @@ def ajacob(dndx,dnde,nodecoor) :
     """ 
     ai = np.zeros([2,2]) 
     ai[0,0] = np.dot(dndx,nodecoor[:,0]) #sum of dndx with xi 
-    #                       (4x2)
-    #               (1x4) . (4x1)
     ai[0,1] = np.dot(dndx,nodecoor[:,1]) #sum of dndx with yi 
     ai[1,0] = np.dot(dnde,nodecoor[:,0]) #sum of dnde with xi 
     ai[1,1] = np.dot(dnde,nodecoor[:,1]) #sum of dnde with yi 

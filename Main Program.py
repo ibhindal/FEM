@@ -111,11 +111,11 @@ for MatNo in range(5):                              # for each material, removed
         #ElemDistMat = np.zeros([8,ndof])           # Element distribution matrix
         E = Mat_Prop_Dict[Material[MatNo]][0]       # Youngs modulus of current material
         v = Mat_Prop_Dict[Material[MatNo]][1]       # Poissions ration of current material
-        ke, D[i] = kecalc(npts,E,v,xyels[i])        # calculates the element siffness matrix
-                                                    # ke: 
+        ke, D[i] = kecalc(npts,E,v,xyels[i,:,:])    # calculates the element siffness matrix
+                                                    # ke: elastic stiffness matrix 
                                                     # D : the D matrix in tensor form, stress = D x strain
         con_matrix = con_mat[i,:]
-        Kg = assembleSys(Kg,ke,con_matrix)   
+        Kg = assembleSys(Kg,ke,con_matrix)          #geometric (initial stress) stiffness matrix
 
 
 plt.plot(Kg)          
