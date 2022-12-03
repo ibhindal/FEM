@@ -1,4 +1,4 @@
-#Main Program
+#Main Program 
 
 import os
 import numpy as np
@@ -26,7 +26,7 @@ globalNodeCoor = mat['nodecoor']
 elemconnect = mat['elemconnect']
 
 nnodes = globalNodeCoor.shape[0]        # Total number of nodes in mesh  
-nelem = int(nnodes/4)                   # Total number of elements in mesh
+nelem = elemconnect.shape[0]            # Total number of elements in mesh
 elemNodeCoor = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
                                         # Array storing xy coordinates of the 4 nodes in an element
 
@@ -34,13 +34,14 @@ elemNodeCoor = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded element.
 for j in range(nelem):                  #for each element
     for i in range(4):                  #for each node in each element
         for k in range(2):              #for x and y coordinates 
-            elemNodeCoor[j,i,k] = globalNodeCoor[j*4 + i,k]
+            elemNodeCoor[j,i,k] = globalNodeCoor[j*4 + i,k] 
+            # elemnodeCoor, the node coordinates of each element (elem x point 1234 x x and y coordinates )
 
 #initialising variables and constants 
 dofpn    = 2                             # dof per node, x co-or and y co-or
 npe      = npts = 4                      # nodes per element  # number of points per element
 ndof     = nnodes*dofpn                  # total number of dof
-nodeCoor = []                            # node coordinate, holding value for the current node                             
+#nodeCoor = []                           # node coordinate, holding value for the current node                             
 
 
 # Young's Modulus and Poission's Ratio for different materials 
@@ -75,20 +76,20 @@ qpt = p                                             # point, vector quadrature p
 qwt = w                                             # weight, vector quadrature weights (npts)
 
 """update this variable. Replace with xyel = elemNodeCoor[j,:,:]? Where j is the element in reference"""
-nquad = qpt.shape[0]                                # Shape of the points returned from GuassQuad, 1x2 for npts=2, 1x4 for npts=4
+nquad = qpt.shape[0]                                # Shape of the points returned from GuassQuad, 1x4 for npts=4
 ke    = np.zeros([8,8])                             # local stiffness matrix
 Kg    = np.zeros((ndof,ndof))                       # global stiffness matrix
 xyel  = np.zeros([4,2])                             # x y coordinnate matrix for the current element, node coordinate matrix (nne X 2)
-#xyels = np.zeros([nelem,4,2])                      # x y coordinates for all elements
-xyels=[]
+xyels = np.zeros([nelem,4,2])                       # x y coordinates for all elements
 
-for c in range(nquad):                              # for each points' connection
-    for w in range(4):                              # for each point
-        a = elemconnect[c][w]                       # get the connectivity of that point
-        bx, by = globalNodeCoor[a]                  # get the co-ordinates of the point
-        xyel[w,0],xyel[w,1] = bx, by                # store the co-ordinates of the point
-    #xyels[nelem, :, :] = xyel                      # array of xyel
-    xyels.append(xyel)
+for i in range(nelem):
+    for c in range(4):                              # for each points' connection , can you run to break point and tell me size of whct  elemconnect
+        """This bit must be wong we output a (nelem x 4 x 2) but we loop (nelem x 4 x 4)"""                              
+        for w in range(2):                          # for each point
+            a = elemconnect[c][w]                   # get the connectivity of that point
+            bx, by = globalNodeCoor[a]              # get the co-ordinates of the point
+            xyel[w,0],xyel[w,1] = bx, by            # store the co-ordinates of the point 
+        xyels[i, :, :] = xyel                       # array of xyel 
 
 for ii in range(nquad) :                            # for each points' connection
     for jj in range(nquad) :                        # for each points' connection
@@ -113,7 +114,7 @@ for MatNo in range(5):                              # for each material, removed
         #ElemDistMat = np.zeros([8,ndof])           # Element distribution matrix
         E = Mat_Prop_Dict[Material[MatNo]][0]       # Youngs modulus of current material
         v = Mat_Prop_Dict[Material[MatNo]][1]       # Poissions ration of current material
-        ke, D[e] = kecalc(npts,E,v,xyels[e])        # calculates the element siffness matrix
+        ke, D[e] = kecalc(npts,E,v,xyels[e, :, :])  # calculates the element siffness matrix
                                                     # ke: 
                                                     # D :
         con_matrix = con_mat[e,:]
@@ -122,8 +123,9 @@ for MatNo in range(5):                              # for each material, removed
 
 plt.plot(Kg)          
 
-##### Dirichlet BC (built-in edge y=0) #######
-nodesbc = np.where(nodeCoor[:,1] == 0)[0]   # find the nodes on edge y=0
+##### Dirichlet BC (built-in edge y=0) ####### 
+#nodesbc = np.where(nodeCoor[:,1] == 0)[0]   # find the nodes on edge y=0
+nodesbc = np.where(xyels[:,:,1] == 0)[0]   # find the nodes on edge y=0
 dofbc = np.c_[3*nodesbc, 3*nodesbc+1, 3*nodesbc+2].flatten()
 K_bc = DirichletBC(Kg,dofbc)    # system matrix after boundary conditions
 
