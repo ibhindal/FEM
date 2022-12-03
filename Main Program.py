@@ -42,7 +42,7 @@ npe      = 4                             # nodes per element
 npts     = 4                             # number of points per element
 ndof     = nnodes*dofpn                  # total number of dof
 nodeCoor = []                            # node coordinate, holding value for the current node                             
-nelmmat  = 1                             # number of elements per material
+nelmmat  = 1                            #edit this # number of elements per material
 
 # Young's Modulus and Poission's Ratio for different materials 
 E_head        = 2.1e11
@@ -83,11 +83,12 @@ Kg=np.zeros((ndof,ndof))                            # global stiffness matrix
 
 """what we need to do is extract each line from elem connect and input each number as an index into nodecoor then assign it to the"""
 """Whatever this code is, I think it is wrong, are my comments right? i can change this to work if so """
+#yes please do. these comments are  correct.
 for c in range(nquad):                              # for each points' connection
     for w in range(4):                              # for each point
         a = elemconnect[c][w]                       # get the connectivity of that point
-        bx, by = globalNodeCoor[a-1]                # get the co-ordinates of the connecting point
-        xyel[w,0],xyel[w,1] = bx, by                # store the co-ordinates of the connecting point
+        bx, by = globalNodeCoor[a]                  # get the co-ordinates of the point
+        xyel[w,0],xyel[w,1] = bx, by                # store the co-ordinates of the point
 
     for ii in range(nquad) :                        # for each points' connection
         for jj in range(nquad) :                    # for each points' connection
