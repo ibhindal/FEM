@@ -16,7 +16,7 @@ def B_function(N, dndx, dnde ,nodeXY):
    """
     #N, dndx, dnde = shapefunDeri.shapefunDeri(xi, eta) 
 
-    Jacob, SF = {}, {} #Jacobi
+    Jacob, SF = {}, {} #Jacobian, Shape function
     SF['sf'], SF['dndx'], SF['dnde'] = N, dndx, dnde 
     Jacob['J'], Jacob['detJ'], Jacob['invJ'] = JacobianMat.ajacob(SF['dndx'], 
                                                                   SF['dnde'], nodeXY) 

@@ -12,7 +12,7 @@ def kecalc(npts,E,v,xyel):
         npts: number of points of the element
         E: Youngs modulus
         v: poissions ratio
-        xyel: coordinates of element points
+        xyel: coordinates of element points (4x2 matrix)
     Output
         ke:  
         D: tensor stiffness matrix
@@ -40,6 +40,7 @@ def kecalc(npts,E,v,xyel):
             sn, dndx, dnde = shapefunDeri(xi, eta)
             ai, detj, I    = ajacob(dndx,dnde,xyel)
             B  = B_function(sn, dndx, dnde ,xyel)
+            B  = np.array(B)
             ke = ke + B.T.dot(D[ii]).dot(B) * detj * wti * wtj
         print('KeCalc - Completed!')
     return ke, D

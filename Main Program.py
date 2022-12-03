@@ -65,7 +65,6 @@ MaterialforElm = np.zeros(nelem)                    # materials for each element
 
 # Connectivity Matrix and Element Material Matrix population
 for i in range(nelem):                              # for each element
-    
     MaterialforElm[i] = elemconnect[i][4]           
     for j in range(4) :                             # for each node in the element
         con_mat[i][j] = np.array(elemconnect[i][j]) # connectivity matrix #check this
@@ -81,15 +80,15 @@ nquad = qpt.shape[0]                                # Shape of the points return
 ke    = np.zeros([8,8])                             # local stiffness matrix
 Kg    = np.zeros((ndof,ndof))                       # global stiffness matrix
 xyel  = np.zeros([4,2])                             # x y coordinnate matrix for the current element, node coordinate matrix (nne X 2)
-xyels = np.zeros([(4*nquad),2])                     # 
-
+#xyels = np.zeros([(4*nquad),2])                    # x y coordinates for all elements
+xyels=[]
 for c in range(nquad):                              # for each points' connection
     for w in range(4):                              # for each point
         a = elemconnect[c][w]                       # get the connectivity of that point
         bx, by = globalNodeCoor[a]                  # get the co-ordinates of the point
         xyel[w,0],xyel[w,1] = bx, by                # store the co-ordinates of the point
-    xyels[c] = xyel                                 #array of xyel
-
+    #xyels[n, :] = xyel                             # array of xyel
+    xyels.append(xyel)
 
 for ii in range(nquad) :                        # for each points' connection
     for jj in range(nquad) :                    # for each points' connection
@@ -110,10 +109,8 @@ count = -1
 D     = np.zeros(nelem)                             # D matrix, in tensor form, a (1 x nelem) matrix   
 
 for MatNo in range(5):                              #for each material, removed nelmmat as it is equal to 1
-    """nelmmat"""                    
-    """8 is a random number"""
-    for e in range(nelem) :                             # for (???)                  
-        #ElemDistMat = np.zeros([8,ndof])            # Element distribution matrix
+    for e in range(nelem) :                         # for (???)                  
+        #ElemDistMat = np.zeros([8,ndof])           # Element distribution matrix
         E = Mat_Prop_Dict[Material[MatNo]][0]       # Youngs modulus of current material
         v = Mat_Prop_Dict[Material[MatNo]][1]       # Poissions ration of current material
         ke, D[e] = kecalc(npts,E,v,xyels[e])        # calculates the element siffness matrix

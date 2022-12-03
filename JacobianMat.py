@@ -15,15 +15,17 @@ def ajacob(dndx,dnde,nodecoor) :
     Returns : 
         ai   : the Jacobian matrix (2 by 2) 
         detj : the determinant of the Jacobian matrix
-        I : 
+        I    : the inverse of the jacobian
     """ 
     ai = np.zeros([2,2]) 
     ai[0,0] = np.dot(dndx,nodecoor[:,0]) #sum of dndx with xi 
+    #                       (4x2)
+    #               (1x4) . (4x1)
     ai[0,1] = np.dot(dndx,nodecoor[:,1]) #sum of dndx with yi 
     ai[1,0] = np.dot(dnde,nodecoor[:,0]) #sum of dnde with xi 
     ai[1,1] = np.dot(dnde,nodecoor[:,1]) #sum of dnde with yi 
     
-    detj = ai[0,0]*ai[1,1]- ai[1,0]*ai[0,1] # determinant of the Jacobian 
+    detj = ai[0,0] * ai[1,1] - ai[1,0] * ai[0,1] # determinant of the Jacobian 
      
     I = np.zeros    # calculate the inverse of the jacobian
     
