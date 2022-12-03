@@ -3,12 +3,14 @@ import shapefunDeri
 import JacobianMat
 import strainDisp2D
 
-#b function is the strain displacement matrix
-#requuires xi, eta and nodal coords
-
-
 def B_function(N, dndx, dnde ,nodeXY):
-   
+   """
+   b function is the strain displacement matrix requuires xi, eta and nodal coords
+   Inputs :
+
+   Returns:
+    B : the strain diplacement matrix 
+   """
     #N, dndx, dnde = shapefunDeri.shapefunDeri(xi, eta) 
  
 
