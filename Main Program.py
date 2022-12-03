@@ -95,7 +95,7 @@ for c in range(nquad):                              # for each points' connectio
 
 #elemNodeCoor  # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
 #xyel the node coordinates of a single element
-#xyels the node coordinates of every 4 no
+#xyels = the node coordinates of every 4 noded element
 
 for ii in range(nquad) :                        # for each points' connection
     for jj in range(nquad) :                    # for each points' connection

@@ -14,16 +14,17 @@ def kecalc(npts,E,v,xyel):
         v: poissions ratio
         xyel: coordinates of element points
     Output
-        ke: 
-        D:
+        ke:  
+        D: tensor stiffness matrix
      """
       
     point, weit = GaussQuad(npts)
     dmat        = E/((1-v)**2) * np.array([[1, v, 0],[v, 1, 0],[0, 0,((1-v)/2)]])
-    
-    D = {}
-    for i in range(npts):          #for each material make a D matrix calculation
-        D[i] = dmat
+    D           = dmat
+
+    #D = {}
+    #for i in range(npts):          #for each material make a D matrix calculation
+    #    D[i] = dmat
 
     ke = np.zeros([8,8])
     count = 0
