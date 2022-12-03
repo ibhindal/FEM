@@ -31,12 +31,12 @@ elemNodeCoor = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded element.
                                         # Array storing xy coordinates of the 4 nodes in an element
 
 # Loops through the globalNodeCoor array and populates elemNodeCoor with the xy coordinates of each node
-for j in range(nelem):                                                  #for each element
-    for i in range(4):                                                  #for each node in each element
-        for k in range(2):                                              #for x and y coordinates 
-            node = elemconnect[j,i]                                     #Get the elements i(th) connection node
-            node_x, node_y, node_z = globalNodeCoor[node, :]            #Get the global co-ordinates of the node
-            elemNodeCoor[j,i,0],elemNodeCoor[j,i,1] = node_x, node_y    #Store the nodes co-ordinates with respect to the element
+for j in range(nelem):                                                  # for each element
+    for i in range(4):                                                  # for each node in each element
+        for k in range(2):                                              # for x and y coordinates 
+            node = elemconnect[j,i]                                     # Get the elements i(th) connection node
+            node_x, node_y, node_z = globalNodeCoor[node, :]            # Get the global co-ordinates of the node
+            elemNodeCoor[j,i,0],elemNodeCoor[j,i,1] = node_x, node_y    # Store the nodes co-ordinates with respect to the element
 
 #initialising variables and constants 
 dofpn    = 2                             # dof per node, x co-or and y co-or
