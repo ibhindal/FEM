@@ -18,19 +18,8 @@ def GaussQuad(npts) :
         weit  : vector quadrature weights (npts)
     """
     point = weit = zeros(npts)          #initialize vector size
-
-    if npts == 2 :                      #Corner point
-        point[0] = 1.0/sqrt(3.0)
-        point[1] = -point[0]
-        weit[0] = 1.000000000000000
-        weit[1] = weit[0]
-        return point, weit              #individual returns means later conditional if statements are not evaluated
-
-    if npts == 4 :                      #Normal point
-        point[0], point[1] = 0.861136311590453,  0.339981043583856
-        point[2],  point[3] = -point[1], -point[0]
-        weit[0],  weit[1]  = 0.347854845137454, 0.652145154862526
-        weit[2], weit[3] = weit[1], weit[0]
-        return point, weit
-
-    return point, weit          #error case returns vectors populated with 0's
+    point[0], point[1] = 0.861136311590453,  0.339981043583856
+    point[2], point[3] = -point[1], -point[0]
+    weit[0],  weit[1]  = 0.347854845137454, 0.652145154862526
+    weit[2],  weit[3]  = weit[1], weit[0]
+    return point, weit

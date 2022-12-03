@@ -71,21 +71,18 @@ for i in range(nelem):                              # for each element
         con_mat[i][j] = np.array(elemconnect[i][j]) # connectivity matrix #check this
     #nodeCoor = globalNodeCoor[i]                    
 
-#Gauss Quadrature points & weights of a Corner (npts=2)
-p,w = GaussQuad.GaussQuad(2)                        # the Gauss Quadrature points & weights
+#Gauss Quadrature points & weights of a Corner (npts=4)
+p,w = GaussQuad.GaussQuad(4)                        # the Gauss Quadrature points & weights
 qpt = p                                             # point, vector quadrature points (npts)
 qwt = w                                             # weight, vector quadrature weights (npts)
 
 """update this variable. Replace with xyel = elemNodeCoor[j,:,:]? Where j is the element in reference"""
-xyel= np.zeros([4,2])                               # x y coordinnate matrix for the current element, node coordinate matrix (nne X 2)
 nquad = qpt.shape[0]                                # Shape of the points returned from GuassQuad, 1x2 for npts=2, 1x4 for npts=4
-ke = np.zeros([8,8])                                # local stiffness matrix
+ke    = np.zeros([8,8])                             # local stiffness matrix
+Kg    = np.zeros((ndof,ndof))                       # global stiffness matrix
+xyel  = np.zeros([4,2])                             # x y coordinnate matrix for the current element, node coordinate matrix (nne X 2)
+xyels = np.zeros([(4*nquad),2])                     # 
 
-Kg=np.zeros((ndof,ndof))                            # global stiffness matrix
-xyels=np.zeros([(4*nquad),2])
-"""what we need to do is extract each line from elem connect and input each number as an index into nodecoor then assign it to the"""
-"""Whatever this code is, I think it is wrong, are my comments right? i can change this to work if so """
-#yes please do. these comments are  correct.
 for c in range(nquad):                              # for each points' connection
     for w in range(4):                              # for each point
         a = elemconnect[c][w]                       # get the connectivity of that point
@@ -93,9 +90,6 @@ for c in range(nquad):                              # for each points' connectio
         xyel[w,0],xyel[w,1] = bx, by                # store the co-ordinates of the point
     xyels[c] = xyel                                 #array of xyel
 
-#elemNodeCoor  # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
-#xyel the node coordinates of a single element
-#xyels = the node coordinates of every 4 noded element
 
 for ii in range(nquad) :                        # for each points' connection
     for jj in range(nquad) :                    # for each points' connection
