@@ -17,85 +17,107 @@ import matplotlib.pyplot as plt
 from assembleSys import assembleSys
 from DirichletBC import DirichletBC
 
-
-#############################################
-
-
-mat = spio.loadmat('data.mat', squeeze_me=(True))
+#Load in mesh
+Meshfilename = 'data.mat'
+mat = spio.loadmat(Meshfilename, squeeze_me=(True)) 
 
 # Assigning variables to the data imported from MATLAB
 globalNodeCoor = mat['nodecoor']
 elemconnect = mat['elemconnect']
 
-# Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
-nnodes = globalNodeCoor.shape[0] # Total number of nodes in mesh  
-nelem = int(nnodes/4) # Total number of elements in mesh
-elemNodeCoor = np.zeros((nelem,4,2)) # Array storing xy coordinates of the 4 nodes in an element
+nnodes = globalNodeCoor.shape[0]        # Total number of nodes in mesh  
+nelem = int(nnodes/4)                   # Total number of elements in mesh
+elemNodeCoor = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
+                                        # Array storing xy coordinates of the 4 nodes in an element
 
-# Loops through the globalNodeCoor array and fills elemNodeCoor with the xy coordinates of the nodes
-x = -1
-for j in range(nelem):
-    for i in range(4):
-        x += 1
-        for k in range(2):
-            elemNodeCoor[j,i,k] = globalNodeCoor[x,k]
+# Loops through the globalNodeCoor array and populates elemNodeCoor with the xy coordinates of each node
+for j in range(nelem):                  #for each element
+    for i in range(4):                  #for each node in each element
+        for k in range(2):              #for x and y coordinates 
+            elemNodeCoor[j,i,k] = globalNodeCoor[j*4 + i,k]
 
+#initialising variables and constants 
+dofpn    = 2                             # dof per node
+npe      = 4                             # nodes per element  
+npts     = 4                             # number of points per element
+ndof     = nnodes*dofpn                  # total number of dof
+nodeCoor = []                            # node coordinate, holding value for the current node                             
+nelmmat  = 1                             # number of elements per material
 
-#mesh.msh[quads]
-con_mat=np.zeros((nelem,4))
-nodeCoor=[]
-ndof =[]
-
-dofpn = 2                               # dof per node
-npe =4                                  # nodes per element     
-ndof = nnodes*dofpn                     # total number of dof
-npts=4                              
-nelmmat= 1                             # number of elements per material
-#element info
-D=np.zeros(nelem)
-
-for i in range(nelem):
-    D[i]=elemconnect[i][4]                         #list of materials for each element
-    for j in range(4) :
-        con_mat[i][j] = np.array(elemconnect[i][j] )# connectivity matrix
-    nodeCoor = globalNodeCoor[i]                    # node coordinate matrix
-
-p,w = GaussQuad.GaussQuad(2) #getting values from GaussQuad
-qpt=p 
-qwt=w 
-
-xyel= np.zeros([4,2]) # update this variable. Replace with xyel = elemNodeCoor[j,:,:]? Where j is the element in reference
-nquad = qpt.shape[0]  # a matric for the coordinates from gaus quad
-ke = np.zeros([8,8]) # Defining the local stiffness matrix
-
-Kg=np.zeros((ndof,ndof)) #Defining the global stiffness matrix
-
-for c in range(nquad):# what we need to do is extract each line from elem connect and input each number as an index into nodecoor then assign it to the
-    for w in range(4):
-        a = elemconnect[c][w]
-        bx,by = globalNodeCoor[a-1] 
+# Young's Modulus and Poission's Ratio for different materials 
+E_head        = 2.1e11
+nu_head       = 0.3
+E_stem        = 1.14e11
+nu_stem       = 0.3
+E_cortical    = 1.6e10
+nu_cortical   = 0.3
+E_trebecular  = 1e9
+nu_trebecular = 0.3
+E_marrow      = 3e8
+nu_marrow     = 0.45
+Mat_Prop_Dict = {"Head" : [E_head, nu_head], "Stem" : [E_stem, nu_stem], "Cortical":[E_cortical,nu_cortical], "Trebecular":[E_trebecular,nu_trebecular], "Marrow":[E_marrow,nu_marrow]}
+Material      = {0 : "Head", 1 : "Stem", 2 : "Cortical", 3 : "Trebecular", 4 : "Marrow"}
     
-        xyel[w,0],xyel[w,1] = bx, by
+# initializes sizes
+D        = np.zeros(nelem)                          # D matrix, a (1 x nelem) matrix   
+con_mat  = np.zeros((nelem,4))                      # connectivity matrix, matrix to associate nodes to belong to an element
 
-    for ii in range(nquad) :
-        for jj in range(nquad) :
-            xi = qpt[ii]                                                    # Stolen from abishek to calculate the
-            eta = qpt[jj]                                                   # Shapefunction and jacobian
-            sn,dsfdx, dsfde = shapefunDeri.shapefunDeri(xi,eta)
-            jacobmat, detj, I = JacobianMat.ajacob(dsfdx, dsfde, xyel)
-                
+# Connectivity Matrix and Element Material Matrix population
+for i in range(nelem):                              # for each element
+    D[i] = elemconnect[i][4]                        # materials for current element appended in the D matrix, follows key of Matrial dictionary
+    for j in range(4) :                             # for each node in the element
+        con_mat[i][j] = np.array(elemconnect[i][j]) # connectivity matrix
+    #nodeCoor = globalNodeCoor[i]                    
 
+#Gauss Quadrature points & weights of a Corner (npts=2)
+p,w = GaussQuad.GaussQuad(2)                        # the Gauss Quadrature points & weights
+qpt = p                                             # point, vector quadrature points (npts)
+qwt = w                                             # weight, vector quadrature weights (npts)
+
+"""update this variable. Replace with xyel = elemNodeCoor[j,:,:]? Where j is the element in reference"""
+xyel= np.zeros([4,2])                               # x y coordinnate matrix for the current element, node coordinate matrix (nne X 2)
+nquad = qpt.shape[0]                                # Shape of the points returned from GuassQuad, 1x2 for npts=2, 1x4 for npts=4
+ke = np.zeros([8,8])                                # local stiffness matrix
+
+Kg=np.zeros((ndof,ndof))                            # global stiffness matrix
+
+"""what we need to do is extract each line from elem connect and input each number as an index into nodecoor then assign it to the"""
+"""Whatever this code is, I think it is wrong, are my comments right? i can change this to work if so """
+for c in range(nquad):                              # for each points' connection
+    for w in range(4):                              # for each point
+        a = elemconnect[c][w]                       # get the connectivity of that point
+        bx, by = globalNodeCoor[a-1]                # get the co-ordinates of the connecting point
+        xyel[w,0],xyel[w,1] = bx, by                # store the co-ordinates of the connecting point
+
+    for ii in range(nquad) :                        # for each points' connection
+        for jj in range(nquad) :                    # for each points' connection
+            xi = qpt[ii]                            # xi, eta : local parametric coordinates
+            eta = qpt[jj]                            
+            sn,dsfdx, dsfde = shapefunDeri.shapefunDeri(xi,eta) #Calculate the derivative of the shape function for a 2D linear quadrangular element with respect to local parametric coordinates xi and eta
+                                                                #  sn   : 
+                                                                #  dsfdx : vector of shape function derivates w.r.t xi dsfde 
+                                                                #  dsfde : vector of shape function derivates w.r.t eta 
+            jacobmat, detj, I = JacobianMat.ajacob(dsfdx, dsfde, xyel) # calculates Jacobian at the local coordinate point (xi,eta)
+                                                                       # jacobmat : the Jacobian matrix (2 by 2) 
+                                                                       # detj     : the determinant of the Jacobian matrix
+
+    #initilizes variables            
     shapefundx,shapefunde = [],[]
     jacob = []
     count = -1
-    
-
-    for D in range(nelmmat):
-        for e in range(8) : # 8 is a random number
-        ElemDistMat= np.zeros([8,ndof]) #Element distrribution matrix
-        ke,dee=kecalc(npts,D,xyel) 
-        con_matrix =con_mat[e,:]
-        Kg = assembleSys(Kg,ke,con_matrix)   
+        
+    for MatNo in range(5):                              #for each material, removed nelmmat as it is equal to 1
+        """nelmmat"""                    
+        """8 is a random number"""
+        for e in range(8) :                             # for (???)                  
+            ElemDistMat = np.zeros([8,ndof])            # Element distribution matrix
+            E = Mat_Prop_Dict[Material[MatNo]][0]       # Youngs modulus of current material
+            v = Mat_Prop_Dict[Material[MatNo]][1]       # Poissions ration of current material
+            ke, D = kecalc(npts,E,v,xyel)               # calculates the element siffness matrix
+                                                        # ke: 
+                                                        # D :
+            con_matrix = con_mat[e,:]
+            Kg = assembleSys(Kg,ke,con_matrix)   
 
 
 plt.plot(Kg)          
@@ -113,7 +135,6 @@ plt.savefig(flnmfig)
 
 
 '''
- 
 print(str((E/(1-nu**2))))
 D = E/(1-nu**2)*np.array([[1, nu, 0], [nu, 1, 0], [0, 0, (1-nu)/2]])
 strainVec = np.dot(bfun,uxy.flatten()) 
