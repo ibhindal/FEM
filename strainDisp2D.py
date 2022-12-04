@@ -5,14 +5,13 @@ from scipy import *
 
 def strainDisp2D(SF,nodeCoor,Jacob) : 
     """ 
-    calculates the strain displacement matrix of a 2D element Inputs : 
-    SF : Shape fun matrix (ShapeFun, ) 
-    nodeCoor : node coordinate matrix (nne X 2) 
-    Jacob : Jacobian data structure (Jacobian, determinant, inverse Jacobian) 
-    
-    Returns : 
-    
-    B : Strain Displacement matrix 
+    calculates the strain displacement matrix of a 2D element 
+    Inputs : 
+        SF       : Shape fun matrix (ShapeFun, ) 
+        nodeCoor : node coordinate matrix (nne X 2) 
+        Jacob    : Jacobian data structure (Jacobian, determinant, inverse Jacobian)  
+    Returns :  
+        B : Strain Displacement matrix 
     """ 
     nne = nodeCoor.shape[0] 
     sf, dsfdx, dsfde = SF['sf'], SF['dndx'], SF['dnde'] 

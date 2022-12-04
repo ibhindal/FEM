@@ -5,19 +5,19 @@ import strainDisp2D
 
 def B_function(N, dndx, dnde ,nodeXY):
     """
-   b function is the strain displacement matrix requuires xi, eta and nodal coords
+   B function is the strain displacement matrix requuires xi, eta and nodal coords
    Inputs :
-        N      : 
-        dndx   :
-        dnde   :
-        nodeXY :
+        N      : Shape function
+        dndx   : 
+        dnde   : 
+        nodeXY : x y co-ordinates of the element
    Returns:
         B : the strain diplacement matrix 
    """
     #N, dndx, dnde = shapefunDeri.shapefunDeri(xi, eta) 
 
-    Jacob, SF = {}, {} #Jacobian, Shape function
-    SF['sf'],   SF['dndx'],    SF['dnde']    = N, dndx, dnde 
+    Jacob, SF = {}, {}                                                                              # Jacobian, Shape function
+    SF['sf'],   SF['dndx'],    SF['dnde']    = N, dndx, dnde                                        # 
     Jacob['J'], Jacob['detJ'], Jacob['invJ'] = JacobianMat.ajacob(SF['dndx'], SF['dnde'], nodeXY) 
-    B = strainDisp2D.strainDisp2D(SF,nodeXY,Jacob) #strain displacement matix
+    B = strainDisp2D.strainDisp2D(SF,nodeXY,Jacob)                                                  # Strain displacement matix
     return B

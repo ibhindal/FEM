@@ -1,4 +1,4 @@
-#Main Program 
+#Main Program
 
 import os
 import numpy as np
@@ -31,18 +31,18 @@ elemNodeCoor = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded element.
                                         # Array storing xy coordinates of the 4 nodes in an element
 
 # Loops through the globalNodeCoor array and populates elemNodeCoor with the xy coordinates of each node
-for j in range(nelem):                  #for each element
-    for i in range(4):                  #for each node in each element
-        for k in range(2):              #for x and y coordinates 
-            elemNodeCoor[j,i,k] = globalNodeCoor[j*4 + i,k] 
-            # elemnodeCoor, the node coordinates of each element (elem x point 1234 x x and y coordinates )
+for j in range(nelem):                                                  # for each element
+    for i in range(4):                                                  # for each node in each element
+        for k in range(2):                                              # for x and y coordinates 
+            node = elemconnect[j,i]                                     # Get the elements i(th) connection node
+            node_x, node_y = globalNodeCoor[node, :]                    # Get the global co-ordinates of the node
+            elemNodeCoor[j,i,0],elemNodeCoor[j,i,1] = node_x, node_y    # Store the nodes co-ordinates with respect to the element
 
 #initialising variables and constants 
 dofpn    = 2                             # dof per node, x co-or and y co-or
 npe      = npts = 4                      # nodes per element  # number of points per element
 ndof     = nnodes*dofpn                  # total number of dof
-#nodeCoor = []                           # node coordinate, holding value for the current node                             
-
+nodeCoor = []                            # node coordinate, holding value for the current node                             
 
 # Young's Modulus and Poission's Ratio for different materials 
 E_head        = 2.1e11
@@ -51,9 +51,9 @@ E_stem        = 1.14e11
 nu_stem       = 0.3
 E_cortical    = 1.6e10
 nu_cortical   = 0.3
-E_trebecular  = 1e9
+E_trebecular  = 1.0e9
 nu_trebecular = 0.3
-E_marrow      = 3e8
+E_marrow      = 3.0e8
 nu_marrow     = 0.45
 Mat_Prop_Dict = {"Head" : [E_head, nu_head], "Stem" : [E_stem, nu_stem], "Cortical":[E_cortical,nu_cortical], "Trebecular":[E_trebecular,nu_trebecular], "Marrow":[E_marrow,nu_marrow]}
 Material      = {0 : "Head", 1 : "Stem", 2 : "Cortical", 3 : "Trebecular", 4 : "Marrow"}
@@ -75,50 +75,49 @@ p,w = GaussQuad.GaussQuad(4)                        # the Gauss Quadrature point
 qpt = p                                             # point, vector quadrature points (npts)
 qwt = w                                             # weight, vector quadrature weights (npts)
 
-"""update this variable. Replace with xyel = elemNodeCoor[j,:,:]? Where j is the element in reference"""
-nquad = qpt.shape[0]                                # Shape of the points returned from GuassQuad, 1x4 for npts=4
+nquad = qpt.shape[0]                                # Shape of the points returned from GuassQuad, 1x2 for npts=2, 1x4 for npts=4
 ke    = np.zeros([8,8])                             # local stiffness matrix
 Kg    = np.zeros((ndof,ndof))                       # global stiffness matrix
 xyel  = np.zeros([4,2])                             # x y coordinnate matrix for the current element, node coordinate matrix (nne X 2)
-xyels = np.zeros([nelem,4,2])                       # x y coordinates for all elements
+xyels = np.zeros([nelem,4,2])                       # x y coordinates for all elements, array of xyel
 
-for i in range(nelem):
-    for c in range(4):                              # for each points' connection , can you run to break point and tell me size of whct  elemconnect
-        """This bit must be wong we output a (nelem x 4 x 2) but we loop (nelem x 4 x 4)"""                              
-        for w in range(2):                          # for each point
-            a = elemconnect[c][w]                   # get the connectivity of that point
-            bx, by = globalNodeCoor[a]              # get the co-ordinates of the point
-            xyel[w,0],xyel[w,1] = bx, by            # store the co-ordinates of the point 
-        xyels[i, :, :] = xyel                       # array of xyel 
+for i in range(nelem):                              # for each element
+    for j in range(nquad):                          # for each points of the element
+        a = elemconnect[i][j]                       # get the j(th) point in the element
+        bx, by = globalNodeCoor[a]                  # get the co-ordinates of the point
+        xyel[j,0],xyel[j,1] = bx, by                # store the co-ordinates of the point
+    xyels[i, :, :] = xyel                           # 
 
-for ii in range(nquad) :                            # for each points' connection
-    for jj in range(nquad) :                        # for each points' connection
-        xi = qpt[ii]                                # xi, eta : local parametric coordinates
-        eta = qpt[jj]                            
+for i in range(nquad) :                            # for each points' connection
+    for j in range(nquad) :                        # for each points' connection
+        xi = qpt[i]                                # xi, eta : local parametric coordinates
+        eta = qpt[j]                            
         sn,dsfdx, dsfde = shapefunDeri.shapefunDeri(xi,eta) #Calculate the derivative of the shape function for a 2D linear quadrangular element with respect to local parametric coordinates xi and eta
-                                                            #  sn   : 
+                                                            #  sn    : shape function
                                                             #  dsfdx : vector of shape function derivates w.r.t xi dsfde 
                                                             #  dsfde : vector of shape function derivates w.r.t eta 
-        jacobmat, detj, I = JacobianMat.ajacob(dsfdx, dsfde, xyel) # calculates Jacobian at the local coordinate point (xi,eta)
+        jacobmat, detj, I = JacobianMat.ajacob(dsfdx, dsfde, xyel)  # calculates Jacobian at the local coordinate point (xi,eta)
                                                                     # jacobmat : the Jacobian matrix (2 by 2) 
                                                                     # detj     : the determinant of the Jacobian matrix
+                                                                    # I        : the inverse jacobian matrix
 
 #initilizes variables            
 shapefundx,shapefunde = [],[]
 jacob = []
 count = -1
-D     = np.zeros(nelem)                             # D matrix, in tensor form, a (1 x nelem) matrix   
+D     = np.zeros(nelem)                             # D matrix, in tensor form, a (1 x nelem) matrix 
+#D = np.zeros(nnodes*3, nnodes*3)  #isaac:i think it should be this
 
 for MatNo in range(5):                              # for each material, removed nelmmat as it is equal to 1
-    for e in range(nelem) :                         # for each element                  
+    for i in range(nelem) :                         # for each element                  
         #ElemDistMat = np.zeros([8,ndof])           # Element distribution matrix
         E = Mat_Prop_Dict[Material[MatNo]][0]       # Youngs modulus of current material
         v = Mat_Prop_Dict[Material[MatNo]][1]       # Poissions ration of current material
-        ke, D[e] = kecalc(npts,E,v,xyels[e, :, :])  # calculates the element siffness matrix
-                                                    # ke: 
-                                                    # D :
-        con_matrix = con_mat[e,:]
-        Kg = assembleSys(Kg,ke,con_matrix)   
+        ke, D[i] = kecalc(npts,E,v,xyels[i,:,:])    # calculates the element siffness matrix
+                                                    # ke: elastic stiffness matrix 
+                                                    # D : the D matrix in tensor form, stress = D x strain
+        con_matrix = con_mat[i,:]
+        Kg = assembleSys(Kg,ke,con_matrix)          #geometric (initial stress) stiffness matrix
 
 
 plt.plot(Kg)          
