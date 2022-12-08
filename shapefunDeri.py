@@ -1,7 +1,4 @@
 import numpy as np
-import scipy
-
-
 
 def shapefunDeri(xi, eta) : 
     """Calculate the derivative of the shape function for a 2D linear quadrangular 
@@ -15,19 +12,12 @@ def shapefunDeri(xi, eta) :
      """ 
     sn = np.zeros(4)
     dndx, dnde = np.zeros(4), np.zeros(4)
-
-    sn[0] = (1.0-xi)*(1.0-eta)/4.0
-    sn[1] = (1.0+xi)*(1.0-eta)/4.0
-    sn[2] = (1.0+xi)*(1.0+eta)/4.0
-    sn[3] = (1.0-xi)*(1.0+eta)/4.0
-
-    dndx[0] = -(1.0-eta)/4.0
-    dnde[0] = -(1.0- xi)/4.0
-    dndx[1] =  (1.0-eta)/4.0
-    dnde[1] = -(1.0+ xi)/4.0
-    dndx[2] =  (1.0+eta)/4.0
-    dnde[2] =  (1.0+ xi)/4.0
-    dndx[3] = -(1.0+eta)/4.0
-    dnde[3] =  (1.0- xi)/4.0
+    sn = np.array([(1 - xi) * (1 - eta) / 4, (1 + xi) * (1 - eta) / 4, (1 + xi) * (1 + eta) / 4, (1 - xi) * (1 + eta) / 4])
+    dndx = np.array([-(1 - eta) / 4, (1 - eta) / 4, (1 + eta) / 4, -(1 + eta) / 4])
+    dnde = np.array([-(1 - xi) / 4, -(1 + xi) / 4, (1 + xi) / 4, (1 - xi) / 4])
     
     return sn, dndx, dnde
+
+
+
+

@@ -63,11 +63,10 @@ nelmmat       = []                     # number of elements per material
 con_mat        = np.zeros((nelem,4))                # connectivity matrix, matrix to associate nodes to belong to an element
 MaterialforElm = np.zeros(nelem)                    # materials for each element, follows key of Matrial dictionary
 
-# Connectivity Matrix and Element Material Matrix population
-for i in range(nelem):                              # for each element
-    MaterialforElm[i] = elemconnect[i][4]           
-    for j in range(4) :                             # for each node in the element
-        con_mat[i][j] = np.array(elemconnect[i][j]) # connectivity matrix #check this
+# Connectivity Matrix and Element Material Matrix population                           
+con_mat[i] = elemconnect[i][:4]                 # for each element
+for j in range(4) :                             # for each node in the element
+    con_mat[i][j] = np.array(elemconnect[i][j]) # connectivity matrix #check this
     #nodeCoor = globalNodeCoor[i]                    
 
 #Gauss Quadrature points & weights of a Corner (npts=4)
