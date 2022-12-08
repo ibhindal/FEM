@@ -1,7 +1,4 @@
 import numpy as np
-import scipy as sp
-from scipy import *
-
 
 def strainDisp2D(SF,nodeCoor,Jacob) : 
     """ 
@@ -14,18 +11,15 @@ def strainDisp2D(SF,nodeCoor,Jacob) :
         B : Strain Displacement matrix 
     """ 
     nne = nodeCoor.shape[0] 
-    sf, dsfdx, dsfde = SF['sf'], SF['dndx'], SF['dnde'] 
+    sf, dsfdx, dsfde = SF[:3]
     I = Jacob['invJ'] 
     r1 = np.c_[dsfdx,np.zeros(nne)].flatten() 
     r2 = np.c_[dsfde,np.zeros(nne)].flatten() 
     R = I.dot(np.c_[r1, r2].T)
-
-    dudx = R[0,:] 
-    dudy = R[1,:] 
+    dudx, dvdy = R[:2]
     r1 = np.c_[np.zeros(nne),dsfdx].flatten()
     r2 = np.c_[np.zeros(nne),dsfde].flatten() 
     R = I.dot(np.c_[r1, r2].T) 
-    dvdx = R[0,:] 
-    dvdy = R[1,:] 
-    B = np.c_[dudx, dvdy, dudy+dvdx].T 
+    dvdx, dvdy = R[:2]
+    B = np.c_[dudx, dvdy, dudy +dvdx].T 
     return B
