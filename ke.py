@@ -39,6 +39,6 @@ def kecalc(npts,E,v,xyel):
             sn, dndx, dnde = shapefunDeri(xi, eta)              # the shape function from point i to point j
             ai, detj, I    = ajacob(dndx,dnde,xyel)             # the jacobian from point i to point j
             B  = B_function(sn, dndx, dnde ,xyel)               # the B matrix from point i to point j
-            ke = ke + B.T.dot(D[i]).dot(B) * detj * wti * wtj   # elastic stiffness matrix, square matrix
-        print('KeCalc - Completed!')
-    return ke, D
+            ke = ke + np.dot(np.dot(B.T, D), B) * detj * wti * wtj   # elastic stiffness matrix, square matrix
+        # print('KeCalc - Completed!')
+    return ke
