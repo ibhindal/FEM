@@ -55,19 +55,19 @@ MaterialforElm = np.zeros(nelem)                    # materials for each element
 shapefundx,shapefunde = [],[]
 jacob = []
 count = -1
-D     = np.zeros(nelem)                             # D matrix, in tensor form, a (1 x nelem) matrix 
+D     = np.zeros(nelem)                             # D matrix, in vector form, a (1 x nelem) matrix 
 
 
 
-#         Kg = assembleSys(Kg,ke,con_matrix)          #geometric (initial stress) stiffness matrix
-Kg = sp.sparse.csr_matrix((ndof,ndof))
+#         Kg = assembleSys(Kg,ke,con_matrix)          
+Kg = sp.sparse.csr_matrix((ndof,ndof))          # geometric (initial stress) stiffness matrix
 for i in range(nelem) :                         # for each element                  
     #ElemDistMat = np.zeros([8,ndof])           # Element distribution matrix
     MatNo = elemconnect[i,4]
     E = Mat_Prop_Dict[Material[MatNo]][0]       # Youngs modulus of current material
-    v = Mat_Prop_Dict[Material[MatNo]][1]       # Poissions ration of current material
-    nodeXY = globalNodeCoor[elemconnect[i,0:4].T,:] # finds the node coordinates on the fly
-    ke = kecalc(npts,E,v,nodeXY)    # calculates the element siffness matrix
+    v = Mat_Prop_Dict[Material[MatNo]][1]       # Poissions ratio of current material
+    nodeXY = globalNodeCoor[elemconnect[i,0:4].T,:] # finds the node coordinates of current element
+    ke = kecalc(npts,E,v,nodeXY)                # calculates the element siffness matrix
                                                 # ke: elastic stiffness matrix 
                                                 # D : the D matrix in tensor form, stress = D x strain
     # con_matrix = con_mat[i,:]
@@ -91,7 +91,6 @@ plt.show()
 flnmfig = "sparsity_K_beforeBC.png"
 plt.savefig(flnmfig)
 
-
 '''
 print(str((E/(1-nu**2))))
 D = E/(1-nu**2)*np.array([[1, nu, 0], [nu, 1, 0], [0, 0, (1-nu)/2]])
@@ -102,11 +101,8 @@ stressVec = np.dot(D,strainVec)
 ################################################################################
 ######## CALCULATING THE EIGENVALUES AND VECTORS OF THE SYSTEM MATRIX ##########
 ################################################################################
-nmodes = 6      # number of modes to calculate~did he mean nodes or is modes correct?
+nmodes = 6      # number of modes to calculate
 eigVal, eigVec = sp.sparse.linalg.eigsh(K_bc, k=nmodes, which='SM')
-
-
-
 # write the mesh in vtk format for visualization in Paraview (for e.g.)
 meshvtk = meshio.Mesh(nodeCoor, elemconnect[0:4])
 
