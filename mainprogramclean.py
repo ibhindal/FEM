@@ -1,12 +1,6 @@
 #Main Program
 
-import os
 import numpy as np
-import areaFun
-import GaussQuad
-import JacobianMat
-import shapefunDeri
-import strainDisp2D
 import assembleSys
 import scipy as sp
 import scipy.io as spio
@@ -104,7 +98,6 @@ D = E/(1-nu**2)*np.array([[1, nu, 0], [nu, 1, 0], [0, 0, (1-nu)/2]])
 strainVec = np.dot(bfun,uxy.flatten()) 
 stressVec = np.dot(D,strainVec) 
 '''
-
 
 ################################################################################
 ######## CALCULATING THE EIGENVALUES AND VECTORS OF THE SYSTEM MATRIX ##########
