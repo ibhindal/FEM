@@ -81,7 +81,7 @@ plt.show()
 
 ##### Dirichlet BC (built-in edge y=0) ####### 
 #nodesbc = np.where(nodeCoor[:,1] == 0)[0]   # find the nodes on edge y=0
-nodesbc = np.where(xyels[:,:,1] == 0)[0]   # find the nodes on edge y=0
+nodesbc = np.where(globalNodeCoor[:,0] == 0)[0]   # find the nodes on edge y=0
 dofbc = np.c_[3*nodesbc, 3*nodesbc+1, 3*nodesbc+2].flatten()
 K_bc = DirichletBC(Kg,dofbc)    # system matrix after boundary conditions
 
@@ -108,13 +108,12 @@ eigVal, eigVec = sp.sparse.linalg.eigsh(K_bc, k=nmodes, which='SM')
 
 
 # write the mesh in vtk format for visualization in Paraview (for e.g.)
-meshvtk = meshio.Mesh(nodeCoor, con_matrix)
+meshvtk = meshio.Mesh(nodeCoor, elemconnect[0:4])
 
 for ii in range(nmodes) :
     nm = "eVec%d" %(ii+1)
     meshvtk.point_data[nm] = np.c_[np.zeros_like(eigVec[::3,ii]),
                 np.zeros_like(eigVec[::3,ii]), eigVec[::3,ii]]
-
 
 
 meshio.write("linear_Mesh.vtk", meshvtk)
