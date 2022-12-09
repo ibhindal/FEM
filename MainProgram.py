@@ -105,7 +105,7 @@ F[topnodeTr] = 1.0 #upward force at trebecular
 F[topnodeHead] = -1.0 #downward force at the head
 
 u = sp.sparse.linalg.spsolve(K_bc, F) #calculate the force matrix then we need to plot u
-
+######not needed########
 ################################################################################
 ######## CALCULATING THE EIGENVALUES AND VECTORS OF THE SYSTEM MATRIX ##########
 ################################################################################
