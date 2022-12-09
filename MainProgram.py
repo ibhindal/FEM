@@ -1,5 +1,5 @@
 #Main Program
-
+import os
 import numpy as np
 import assembleSys
 import scipy as sp
@@ -80,9 +80,9 @@ plt.show()
 
 
 ##### Dirichlet BC (built-in edge y=0) ####### 
-#nodesbc = np.where(nodeCoor[:,1] == 0)[0]   # find the nodes on edge y=0
-nodesbc = np.where(globalNodeCoor[:,0] == 0)[0]   # find the nodes on edge y=0
-dofbc = np.c_[3*nodesbc, 3*nodesbc+1, 3*nodesbc+2].flatten()
+
+nodesbc = np.where(globalNodeCoor[:,1] == np.min(globalNodeCoor[:,1]))  # find the nodes on edge y=0
+dofbc = np.c_[2*nodesbc[0], 2*nodesbc[0]+1].flatten()
 K_bc = DirichletBC(Kg,dofbc)    # system matrix after boundary conditions
 
 # Plot the sparsity of the system stiffness matrix
@@ -117,3 +117,5 @@ for ii in range(nmodes) :
 
 
 meshio.write("linear_Mesh.vtk", meshvtk)
+print("done")
+os.system("pause")
