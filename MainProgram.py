@@ -98,10 +98,18 @@ strainVec = np.dot(bfun,uxy.flatten())
 stressVec = np.dot(D,strainVec) 
 '''
 
+topnodeTr = 2*171 + 1 # replace 171 with the index of the top node of the trebecular bone
+topnodeHead = 2*300 + 1 # replace 300 with the index of the top node of the implant  head
+F  = np.zeros(K_bc.shape[0]) #is the force 
+F[topnodeTr] = 1.0 #upward force at trebecular
+F[topnodeHead] = -1.0 #downward force at the head
+
+u = sp.sparse.linalg.spsolve(K_bc, F) #calculate the force matrix then we need to plot u
+
 ################################################################################
 ######## CALCULATING THE EIGENVALUES AND VECTORS OF THE SYSTEM MATRIX ##########
 ################################################################################
-nmodes = 6      # number of modes to calculate
+""" nmodes = 6      # number of modes to calculate
 eigVal, eigVec = sp.sparse.linalg.eigsh(K_bc, k=nmodes, which='SM')
 # write the mesh in vtk format for visualization in Paraview (for e.g.)
 meshvtk = meshio.Mesh(nodeCoor, elemconnect[0:4])
@@ -113,4 +121,4 @@ for ii in range(nmodes) :
 
 
 meshio.write("linear_Mesh.vtk", meshvtk)
-print("done")
+print("done") """
