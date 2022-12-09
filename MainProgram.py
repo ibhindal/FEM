@@ -78,17 +78,21 @@ plt.show()
 flnmfig = "sparsity_K_beforeBC.png"
 plt.savefig(flnmfig)
 
-a = float('-inf')
-for i in range(nelem): # for each element
-    if (3 == elemconnect[i,4]): # check element is the correct material
-        if (True):  # check element is higher than the last 
-            a = i # update a to have the new highest found element
-topnodeTr = 2*a+1                                   # replace 171 with the index of the top node of the trebecular bone #Isaac: i think *2 for force fx and fy, +1 is ?
-topnodeHead = 2*np.max(elemconnect[:,1]) + 1        # replace 300 with the index of the top node of the implant  head
-F  = np.zeros(K_bc.shape[0])                        # is the force 
-F[topnodeTr] = 1.0                                  # upward force at trebecular
-F[topnodeHead] = -1.0                               # downward force at the head
+a = float('-inf')                                       # holds the index of the top node of the trebecular material
+for i in range(nelem):                                  # for each element
+    if (3 == elemconnect[i,4]):                         # check element is the correct material
+        try:
+            if (globalNodeCoor[a,1] < globalNodeCoor[i,1]): # check element is higher than the last 
+                a = i                                       # update a to have the new highest found element
+        except:                                         # first trebecular element found 
+            a = i
+            continue
+topnodeTr      = 2*a+1                                  # index of the top node of the trebecular bone #Isaac: i think *2 for force fx and fy, +1 is for the y component
+topnodeHead    = 2*np.max(elemconnect[:,1]) + 1         # top node of the implant head == top node
+F              = np.zeros(K_bc.shape[0])                # Global Force vector  
+F[topnodeTr]   = 1.0                                    # upward force at trebecular
+F[topnodeHead] = -1.0                                   # downward force at the head
 
-u = sp.sparse.linalg.spsolve(K_bc, F) #calculate the force matrix then we need to plot u
+u = sp.sparse.linalg.spsolve(K_bc, F)                   # Calculate the force matrix then we need to plot u #isaac:What?
 
 print("done")
