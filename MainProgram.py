@@ -118,4 +118,3 @@ for ii in range(nmodes) :
 
 meshio.write("linear_Mesh.vtk", meshvtk)
 print("done")
-os.system("pause")
