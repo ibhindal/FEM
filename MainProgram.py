@@ -12,7 +12,7 @@ from DirichletBC import DirichletBC
 #Load in mesh
 Meshfilename = 'data.mat'
 mat = spio.loadmat(Meshfilename, squeeze_me=(True)) 
-print("file Loaded")
+print("\n\n\nfile Loaded")
 
 # Assigning variables to the data imported from MATLAB
 globalNodeCoor = mat['nodecoor']
@@ -44,9 +44,7 @@ Mat_Prop_Dict = {"Head" : [E_head, nu_head], "Stem" : [E_stem, nu_stem], "Cortic
 Material      = {0 : "Head", 1 : "Stem", 2 : "Cortical", 3 : "Trebecular", 4 : "Marrow"}
 print("Matrial properties determined")
 
-# initializes variables
-con_mat        = np.zeros((nelem,4))                # connectivity matrix, matrix to associate nodes to belong to an element
-MaterialforElm = np.zeros(nelem)                    # materials for each element, follows key of Matrial dictionary           
+# initializes variables     
 shapefundx = shapefunde = jacob = []                # shape function (dx), shape function (de), Jacobian (will store the jacibian, inverse jacobian and determinate)
 D     = np.zeros(nelem)                             # D matrix, in vector form, a (1 x nelem) matrix          
 Kg    = sp.sparse.csr_matrix((ndof,ndof))           # geometric (initial stress) stiffness matrix
@@ -66,11 +64,10 @@ plt.show()
 print('Stiffness Matrices calculated')
 
 ##### Dirichlet BC (built-in edge y=(min_y)) ####### 
-min_y    = np.min(globalNodeCoor[:,1])
-print(min_y)
-nodesbc = np.where(globalNodeCoor[:,1] == min_y)                        # find the nodes on the bottom edge y=(min_y)
-dofbc   = np.c_[2*nodesbc[0], 2*nodesbc[0]+1].flatten()                 #
-K_bc    = DirichletBC(Kg,dofbc)                                         # system matrix after boundary conditions
+min_y   = np.min(globalNodeCoor[:,1])
+nodesbc = np.where(globalNodeCoor[:,1] == min_y)           # find the nodes on the bottom edge y=(min_y)
+dofbc   = np.c_[2*nodesbc[0], 2*nodesbc[0]+1].flatten()    #
+K_bc    = DirichletBC(Kg,dofbc)                            # system matrix after boundary conditions
 
 # Plot the sparsity of the system stiffness matrix
 plt.spy(K_bc, markersize=0.1)
@@ -90,9 +87,48 @@ for i in range(nelem):                                  # for each element
 topnodeTr      = 2*a+1                                  # index of the top node of the trebecular bone #Isaac: i think *2 for force fx and fy, +1 is for the y component
 topnodeHead    = 2*np.max(elemconnect[:,1]) + 1         # top node of the implant head == top node
 F              = np.zeros(K_bc.shape[0])                # Global Force vector  
-F[topnodeTr]   = 1.0                                    # upward force at trebecular
+F[topnodeTr]   =  1.0                                   # upward force at trebecular
 F[topnodeHead] = -1.0                                   # downward force at the head
+print("Forces and boundary conditions determined")
 
 u = sp.sparse.linalg.spsolve(K_bc, F)                   # Calculate the force matrix then we need to plot u #isaac:What?
+print("Deformation solved")                             # calulates the displacement/ deformation
 
-print("done")
+st = 1
+print("Stress solved")  #Stress = D x strain 
+
+# plot the deformation, u
+
+# plot the stress, st
+
+"""
+###### Abishek Lab 3, Code to output plot of deformation #########
+from matplotlib.tri import Triangulation
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import numpy as np
+import meshio
+filenm = 'data.mat'
+mesh = meshio.read(filenm)                                  # optionally specify file_format
+mesh.cell_data                                              # reveals all physical tags
+mesh.cell_data['line']['gmsh:physical']                     # following shows the physical tags (1: bc, 2: load)
+meshvtk = meshio.Mesh(mesh.points, mesh.cells)              # write the mesh in vtk format for visualization in Paraview (for e.g.)
+meshio.write("simpleModMeshio.vtk", meshvtk)
+triang = Triangulation(mesh.points[:,0], mesh.points[:,1])
+circx, circy = 0.4, 0.0
+min_radius = 0.15
+triang.set_mask(np.hypot((mesh.points[:,0]-circx)[triang.triangles].mean(axis=1),(mesh.points[:,1]-circy)[triang.triangles].mean(axis=1))< min_radius)
+dax, day = 0.0, 0.0
+zarbit = np.hypot(mesh.points[:,0] - dax, mesh.points[:,1] - day)
+fig, ax = plt.subplots()
+ax.set_aspect('equal')
+ax.use_sticky_edges = False                                 # Enforce the margins, and enlarge them to give room for the vectors.
+ax.margins(0.07)
+ax.triplot(triang, lw=0.5, color='1.0')                     # The blank mesh
+levels = np.arange(0., 1., 0.025)
+cmap = cm.get_cmap(name='terrain', lut=None)
+ax.tricontourf(triang, zarbit, levels = levels, cmap = cmap)
+ax.tricontour (triang, zarbit, levels = levels, colors = ['0.25', '0.5', '0.5', '0.5', '0.5'], linewidths = [1.0, 0.5, 0.5, 0.5, 0.5])
+plt.show()
+"""
+print("End of Program")
