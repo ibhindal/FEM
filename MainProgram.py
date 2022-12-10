@@ -8,9 +8,7 @@ from ke import kecalc
 import matplotlib.pyplot as plt
 from assembleSys import assembleSys
 from DirichletBC import DirichletBC
-
-import meshio
-from matplotlib.tri import Triangulation
+#from matplotlib.tri import Triangulation
 
 #Load in mesh
 Meshfilename = 'data.mat'
@@ -25,7 +23,6 @@ nelem        = elemconnect.shape[0]     # Total number of elements in mesh
 elemNodeCoor = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
 print("data imported")                  # Array storing xy coordinates of the 4 nodes in an element
 
-
 # Plot the Mesh and output to user
 nx = ny = np.zeros(4*nelem)
 for i in range(nelem):
@@ -33,7 +30,8 @@ for i in range(nelem):
         nx[i*4+ j] = globalNodeCoor[elemconnect[i,j], 0]
         ny[i*4+ j] = globalNodeCoor[elemconnect[i,j], 1]
 
-plt.plot(nx,ny) # trying to plot the mesh
+#plt.plot(nx,ny) # trying to plot the mesh with element lines 
+plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1],'ro', markersize=1) # plots the points 
 plt.show()
 
 #initialising variables and constants 
@@ -111,17 +109,18 @@ st = 1
 print("Stress solved")  #Stress = D x strain 
 
 # plot the deformation, u
+u_x = [num for i, num in enumerate(u) if i % 2 == 0]
+u_y = [num for i, num in enumerate(u) if i % 2 == 1]
+plt.plot(u_x + globalNodeCoor[:,0],u_y + globalNodeCoor[:,1])
+plt.show()
 
 # plot the stress, st
 
 
-
 # extract necessary data
 
-# plot the mesh
 
-#plt.plot(u[even],u[odd])
-#plt.show()
+
 
 """
 ###### Abishek Lab 3, Code to output plot of deformation #########
@@ -153,4 +152,4 @@ ax.tricontourf(triang, zarbit, levels = levels, cmap = cmap)
 ax.tricontour (triang, zarbit, levels = levels, colors = ['0.25', '0.5', '0.5', '0.5', '0.5'], linewidths = [1.0, 0.5, 0.5, 0.5, 0.5])
 plt.show()
 """
-print("End of Program")
+print("End of Program\n\n\n")
