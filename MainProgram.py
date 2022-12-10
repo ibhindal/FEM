@@ -27,7 +27,7 @@ print("data imported")                    # Array storing xy coordinates of the 
 nx = ny = np.zeros(4) 
 for i in range(nelem):
     for j in range(4):
-        nx[j] = globalNodeCoor[elemconnect[i,j], 0]
+        nx[j] = globalNodeCoor[elemconnect[i,j], 0]     # not getting the desired value yet, i want the x co-ordinate of the elements jth node 
         ny[j] = globalNodeCoor[elemconnect[i,j], 1]
         if j > 0 :
             plt.plot([nx[j-1],nx[j]],[ny[j-1],ny[j]])   #plot a line of the quadrangular element
@@ -61,8 +61,8 @@ print("Matrial properties determined")
 
 # initializes variables     
 shapefundx = shapefunde = jacob = []                # shape function (dx), shape function (de), Jacobian (will store the jacibian, inverse jacobian and determinate)
-D     = np.zeros(nelem)                             # D matrix, in vector form, a (1 x nelem) matrix          
-Kg    = sp.sparse.csr_matrix((ndof,ndof))           # geometric (initial stress) stiffness matrix
+D          = np.zeros(nelem)                        # D matrix, in vector form, a (1 x nelem) matrix          
+Kg         = sp.sparse.csr_matrix((ndof,ndof))      # geometric (initial stress) stiffness matrix
 
 for i in range(nelem) :                             # for each element                  
     MatNo = elemconnect[i,4]    
