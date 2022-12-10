@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 from assembleSys import assembleSys
 from DirichletBC import DirichletBC
 
+import meshio
+from matplotlib.tri import Triangulation
+
 #Load in mesh
 Meshfilename = 'data.mat'
 mat = spio.loadmat(Meshfilename, squeeze_me=(True)) 
@@ -17,11 +20,21 @@ print("\n\n\nfile Loaded")
 # Assigning variables to the data imported from MATLAB
 globalNodeCoor = mat['nodecoor']
 elemconnect    = mat['elemconnect'] - 1
-
 nnodes       = globalNodeCoor.shape[0]  # Total number of nodes in mesh  
 nelem        = elemconnect.shape[0]     # Total number of elements in mesh
 elemNodeCoor = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
 print("data imported")                  # Array storing xy coordinates of the 4 nodes in an element
+
+
+# Plot the Mesh and output to user
+nx = ny = np.zeros(4*nelem)
+for i in range(nelem):
+    for j in range(4):
+        nx[i*4+ j] = globalNodeCoor[elemconnect[i,j], 0]
+        ny[i*4+ j] = globalNodeCoor[elemconnect[i,j], 1]
+
+plt.plot(nx,ny) # trying to plot the mesh
+plt.show()
 
 #initialising variables and constants 
 dofpn    = 2                            # degrees of freedom per node, x co-or and y co-or
@@ -100,6 +113,15 @@ print("Stress solved")  #Stress = D x strain
 # plot the deformation, u
 
 # plot the stress, st
+
+
+
+# extract necessary data
+
+# plot the mesh
+
+#plt.plot(u[even],u[odd])
+#plt.show()
 
 """
 ###### Abishek Lab 3, Code to output plot of deformation #########
