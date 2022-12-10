@@ -18,20 +18,24 @@ print("\n\n\nfile Loaded")
 # Assigning variables to the data imported from MATLAB
 globalNodeCoor = mat['nodecoor']
 elemconnect    = mat['elemconnect'] - 1
-nnodes       = globalNodeCoor.shape[0]  # Total number of nodes in mesh  
-nelem        = elemconnect.shape[0]     # Total number of elements in mesh
-elemNodeCoor = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
-print("data imported")                  # Array storing xy coordinates of the 4 nodes in an element
+nnodes         = globalNodeCoor.shape[0]  # Total number of nodes in mesh  
+nelem          = elemconnect.shape[0]     # Total number of elements in mesh
+elemNodeCoor   = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
+print("data imported")                    # Array storing xy coordinates of the 4 nodes in an element
 
 # Plot the Mesh and output to user
-nx = ny = np.zeros(4*nelem)
+nx = ny = np.zeros(4) 
 for i in range(nelem):
     for j in range(4):
-        nx[i*4+ j] = globalNodeCoor[elemconnect[i,j], 0]
-        ny[i*4+ j] = globalNodeCoor[elemconnect[i,j], 1]
+        nx[j] = globalNodeCoor[elemconnect[i,j], 0]
+        ny[j] = globalNodeCoor[elemconnect[i,j], 1]
+        if j > 0 :
+            plt.plot([nx[j-1],nx[j]],[ny[j-1],ny[j]])   #plot a line of the quadrangular element
+        if j == 3 :
+            plt.plot([nx[0],nx[3]],[ny[0],ny[3]])       #plot the line of the quadrangular element from the first node to the last
 
 #plt.plot(nx,ny) # trying to plot the mesh with element lines 
-plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1],'ro', markersize=1) # plots the points 
+plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1],'ro', markersize=0.5) # plots the points 
 plt.show()
 
 #initialising variables and constants 
@@ -109,9 +113,10 @@ st = 1
 print("Stress solved")  #Stress = D x strain 
 
 # plot the deformation, u
-u_x = [num for i, num in enumerate(u) if i % 2 == 0]
-u_y = [num for i, num in enumerate(u) if i % 2 == 1]
-plt.plot(u_x + globalNodeCoor[:,0],u_y + globalNodeCoor[:,1])
+EF = 1                                                  # Exageration Factor
+u_x = [num for i, num in enumerate(u) if i % 2 == 0]    # x component deformations
+u_y = [num for i, num in enumerate(u) if i % 2 == 1]    # y component deformations
+plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'ro', markersize = 0.5) # plots deformations + initial position
 plt.show()
 
 # plot the stress, st
