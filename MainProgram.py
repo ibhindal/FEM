@@ -25,13 +25,12 @@ print("data imported")                    # Array storing xy coordinates of the 
 
 # Plot the Mesh and output to user
 colour = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'}
-nx = np.zeros(4)
-ny = np.zeros(4) 
+nx, ny = np.zeros(4), np.zeros(4) 
 plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1],'ro', markersize=0.5) # plots the points 
 for i in range(nelem):
     color = colour[elemconnect[i,4]]
     for j in range(4):
-        nx[j] = globalNodeCoor[elemconnect[i,j], 0]            # not getting the desired value yet, i want the x co-ordinate of the elements jth node 
+        nx[j] = globalNodeCoor[elemconnect[i,j], 0]            
         ny[j] = globalNodeCoor[elemconnect[i,j], 1]
         if j > 0 :
             plt.plot([nx[j-1],nx[j]],[ny[j-1],ny[j]], color)   #plot a line of the quadrangular element
@@ -116,7 +115,7 @@ print("Deformation solved")                             # calulates the displace
 st = 1
 print("Stress solved")  #Stress = D x strain 
 
-# plot the deformation, u
+# plot the deformation, u on the mesh
 EF = 1                                                  # Exageration Factor
 colour = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'}
 nx, ny, ux, uy  = np.zeros(4), np.zeros(4), np.zeros(4), np.zeros(4)
@@ -131,10 +130,9 @@ for i in range(nelem):
         ux[j] = u_x[elemconnect[i,j]]
         uy[j] = u_y[elemconnect[i,j]]
         if j > 0 :
-            plt.plot([nx[j-1]+ux[j-1],nx[j]+ux[j]],[ny[j-1]+uy[j-1],ny[j]+uy[j]], color)   #plot a line of the quadrangular element
+            plt.plot([nx[j-1]+ux[j-1]*EF,nx[j]+ux[j]*EF],[ny[j-1]+uy[j-1]*EF,ny[j]+uy[j]*EF], color)   #plot a line of the quadrangular element
         if j == 3 :
-            plt.plot([nx[0]+ux[0],nx[3]+ux[3]],[ny[0]+uy[0],ny[3]+uy[3]], color)       #plot the line of the quadrangular element from the first node to the last
-
+            plt.plot([nx[0]+ux[0]*EF,nx[3]+ux[3]*EF],[ny[0]+uy[0]*EF,ny[3]+uy[3]*EF], color)           #plot the line of the quadrangular element from the first node to the last
 
 plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'ro', markersize = 0.5) # plots deformations + initial position
 plt.show()
