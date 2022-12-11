@@ -117,18 +117,17 @@ print("Stress solved")  #Stress = D x strain
 
 # plot the deformation, u on the mesh
 EF = 1                                                  # Exageration Factor
-colour = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'}
 nx, ny, ux, uy  = np.zeros(4), np.zeros(4), np.zeros(4), np.zeros(4)
 u_x = [num for i, num in enumerate(u) if i % 2 == 0]    # x component deformations
 u_y = [num for i, num in enumerate(u) if i % 2 == 1]    # y component deformations
 
 for i in range(nelem):
-    color = colour[elemconnect[i,4]]   #set colour scheme to be a measure of deformation (green to red coloours bar)
     for j in range(4):
         nx[j] = globalNodeCoor[elemconnect[i,j], 0]            
         ny[j] = globalNodeCoor[elemconnect[i,j], 1]
-        ux[j] = u_x[elemconnect[i,j]]
-        uy[j] = u_y[elemconnect[i,j]]
+        ux[j] =            u_x[elemconnect[i,j]]
+        uy[j] =            u_y[elemconnect[i,j]]
+        color = (u_x[j] + u_y[j], 0.0, 0.0)             # set colour scheme to be a measure of deformation (green to red coloours bar), RGB tuple format
         if j > 0 :
             plt.plot([nx[j-1]+ux[j-1]*EF,nx[j]+ux[j]*EF],[ny[j-1]+uy[j-1]*EF,ny[j]+uy[j]*EF], color)   #plot a line of the quadrangular element
         if j == 3 :
