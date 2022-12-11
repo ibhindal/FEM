@@ -91,32 +91,32 @@ plt.show()
 flnmfig = "sparsity_K_beforeBC.png"
 plt.savefig(flnmfig)
 
-a = float('-inf')                                       # holds the index of the top node of the trebecular material
-for i in range(nelem):                                  # for each element
-    if (3 == elemconnect[i,4]):                         # check element is the correct material
+a = float('-inf')                                   # holds the index of the top node of the trebecular material
+for i in range(nelem):                              # for each element
+    if (3 == elemconnect[i,4]):                     # check element is the correct material
         try:
             if (globalNodeCoor[a,1] < globalNodeCoor[i,1]): # check element is higher than the last 
                 a = i                                       # update a to have the new highest found element
         except:                                         # first trebecular element found 
             a = i
             continue
-topnodeTr        = 2*a+1                                # index of the top node of the trebecular bone #Isaac: i think *2 for force fx and fy, +1 is for the y component
-topnodeHead      = 2*np.max(elemconnect[:,1]) + 1       # top node of the implant head == top node
-F                = np.zeros(K_bc.shape[0])              # Global Force vector  
-F[topnodeTr]     =  1.0                                 # upward force at trebecular
-F[topnodeHead]   = -1.0                                 # downward force at the head
-F[topnodeHead-1] =  1.0                                 # force in x direction at the head
+topnodeTr        = 2*a+1                            # index of the top node of the trebecular bone #Isaac: i think *2 for force fx and fy, +1 is for the y component
+topnodeHead      = 2*np.max(elemconnect[:,1]) + 1   # top node of the implant head == top node
+F                = np.zeros(K_bc.shape[0])          # Global Force vector  
+F[topnodeTr]     =  1.0                             # upward force at trebecular
+F[topnodeHead]   = -1.0                             # downward force at the head
+F[topnodeHead-1] =  1.0                             # force in x direction at the head
 print("Forces and boundary conditions determined")
 
-u = sp.sparse.linalg.spsolve(K_bc, F)                   # Calculate the force matrix then we need to plot u #isaac:What?
-print("Deformation solved")                             # calulates the displacement/ deformation
+u = sp.sparse.linalg.spsolve(K_bc, F)               # Calculate the force matrix then we need to plot u #isaac:What?
+print("Deformation solved")                         # Calulates the displacement/ deformation
 
 st = 1
 #stress =  D[]. B[] . u
 print("Stress solved")  #Stress = D x strain 
 
 # plot the deformation, u on the mesh
-EF = 1                                                  # Exageration Factor
+EF = 1                                              # Exageration Factor
 nx, ny, ux, uy  = np.zeros(4), np.zeros(4), np.zeros(4), np.zeros(4)
 u_x = [num for i, num in enumerate(u) if i % 2 == 0]    # x component deformations
 u_y = [num for i, num in enumerate(u) if i % 2 == 1]    # y component deformations
