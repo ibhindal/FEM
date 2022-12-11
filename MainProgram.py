@@ -63,8 +63,7 @@ Material      = {0 : "Head", 1 : "Stem", 2 : "Cortical", 3 : "Trebecular", 4 : "
 print("Matrial properties determined")
 
 # initializes variables     
-shapefundx = shapefunde = jacob = []                # shape function (dx), shape function (de), Jacobian (will store the jacibian, inverse jacobian and determinate)
-D          = np.zeros(nelem)                        # D matrix, in vector form, a (1 x nelem) matrix          
+shapefundx = shapefunde = jacob = []                # shape function (dx), shape function (de), Jacobian (will store the jacibian, inverse jacobian and determinate)        
 Kg         = sp.sparse.csr_matrix((ndof,ndof))      # geometric (initial stress) stiffness matrix
 
 for i in range(nelem) :                             # for each element                  
@@ -72,9 +71,8 @@ for i in range(nelem) :                             # for each element
     E = Mat_Prop_Dict[Material[MatNo]][0]           # Youngs modulus of current material
     v = Mat_Prop_Dict[Material[MatNo]][1]           # Poissions ratio of current material
     nodeXY = globalNodeCoor[elemconnect[i,0:4].T,:] # finds the node coordinates of current element
-    ke = kecalc(npts,E,v,nodeXY)                    # calculates the element siffness matrix
+    ke, D[], B[] = kecalc(npts,E,v,nodeXY)          # calculates the element siffness matrix
                                                         # ke: elastic stiffness matrix 
-                                                        # D : the D matrix in tensor form, stress = D x strain
     Kg = assembleSys(Kg,ke,elemconnect[i,0:4])      # geometric (initial stress) stiffness matrix
 
 plt.spy(Kg, markersize=0.1)                         # plots the mattrix showing sparcity?
@@ -102,18 +100,19 @@ for i in range(nelem):                                  # for each element
         except:                                         # first trebecular element found 
             a = i
             continue
-topnodeTr        = 2*a+1                                  # index of the top node of the trebecular bone #Isaac: i think *2 for force fx and fy, +1 is for the y component
-topnodeHead      = 2*np.max(elemconnect[:,1]) + 1         # top node of the implant head == top node
-F                = np.zeros(K_bc.shape[0])                # Global Force vector  
-F[topnodeTr]     =  1.0                                   # upward force at trebecular
-F[topnodeHead]   = -1.0                                   # downward force at the head
-F[topnodeHead-1] =  1.0                                   # force in x direction at the head
+topnodeTr        = 2*a+1                                # index of the top node of the trebecular bone #Isaac: i think *2 for force fx and fy, +1 is for the y component
+topnodeHead      = 2*np.max(elemconnect[:,1]) + 1       # top node of the implant head == top node
+F                = np.zeros(K_bc.shape[0])              # Global Force vector  
+F[topnodeTr]     =  1.0                                 # upward force at trebecular
+F[topnodeHead]   = -1.0                                 # downward force at the head
+F[topnodeHead-1] =  1.0                                 # force in x direction at the head
 print("Forces and boundary conditions determined")
 
 u = sp.sparse.linalg.spsolve(K_bc, F)                   # Calculate the force matrix then we need to plot u #isaac:What?
 print("Deformation solved")                             # calulates the displacement/ deformation
 
 st = 1
+#stress =  D[]. B[] . u
 print("Stress solved")  #Stress = D x strain 
 
 # plot the deformation, u on the mesh

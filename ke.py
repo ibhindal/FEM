@@ -27,6 +27,7 @@ def kecalc(npts,E,v,xyel):
     #    D[i] = dmat
 
     ke = np.zeros([8,8])
+    Stress = np.zeros(4)
     count = 0
 
     for i in range(npts) :                                      # for number of points in element
