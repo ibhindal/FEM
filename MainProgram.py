@@ -119,10 +119,7 @@ print("Stress solved")  #Stress = D x strain
 # plot the deformation, u
 EF = 1                                                  # Exageration Factor
 colour = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'}
-nx  = np.zeros(4)
-ny  = np.zeros(4)
-ux  = np.zeros(4)
-uy  = np.zeros(4)
+nx, ny, ux, uy  = np.zeros(4), np.zeros(4), np.zeros(4), np.zeros(4)
 u_x = [num for i, num in enumerate(u) if i % 2 == 0]    # x component deformations
 u_y = [num for i, num in enumerate(u) if i % 2 == 1]    # y component deformations
 
@@ -141,28 +138,6 @@ for i in range(nelem):
 
 plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'ro', markersize = 0.5) # plots deformations + initial position
 plt.show()
-
-"""
-# Plot the Mesh and output to user
-colour = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'}
-nx = np.zeros(4)
-ny = np.zeros(4) 
-plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1],'ro', markersize=0.5) # plots the points 
-for i in range(nelem):
-    color = colour[elemconnect[i,4]]
-    for j in range(4):
-        nx[j] = globalNodeCoor[elemconnect[i,j], 0]            # not getting the desired value yet, i want the x co-ordinate of the elements jth node 
-        ny[j] = globalNodeCoor[elemconnect[i,j], 1]
-        if j > 0 :
-            plt.plot([nx[j-1],nx[j]],[ny[j-1],ny[j]], color)   #plot a line of the quadrangular element
-        if j == 3 :
-            plt.plot([nx[0],nx[3]],[ny[0],ny[3]], color)       #plot the line of the quadrangular element from the first node to the last
-
-#plt.plot(nx,ny) # trying to plot the mesh with element lines 
-plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1],'ro', markersize=0.5) # plots the points 
-plt.show()
-"""
-
 
 # plot the stress, st
 
