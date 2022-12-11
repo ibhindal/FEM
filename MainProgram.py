@@ -123,7 +123,7 @@ u_x = [num for i, num in enumerate(u) if i % 2 == 0]    # x component deformatio
 u_y = [num for i, num in enumerate(u) if i % 2 == 1]    # y component deformations
 
 for i in range(nelem):
-    color = colour[elemconnect[i,4]]
+    color = colour[elemconnect[i,4]]   #set colour scheme to be a measure of deformation (green to red coloours bar)
     for j in range(4):
         nx[j] = globalNodeCoor[elemconnect[i,j], 0]            
         ny[j] = globalNodeCoor[elemconnect[i,j], 1]
