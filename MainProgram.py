@@ -71,7 +71,7 @@ for i in range(nelem) :                             # for each element
     E = Mat_Prop_Dict[Material[MatNo]][0]           # Youngs modulus of current material
     v = Mat_Prop_Dict[Material[MatNo]][1]           # Poissions ratio of current material
     nodeXY = globalNodeCoor[elemconnect[i,0:4].T,:] # finds the node coordinates of current element
-    ke, D[], B[] = kecalc(npts,E,v,nodeXY)          # calculates the element siffness matrix
+    ke = kecalc(npts,E,v,nodeXY)          # calculates the element siffness matrix
                                                         # ke: elastic stiffness matrix 
     Kg = assembleSys(Kg,ke,elemconnect[i,0:4])      # geometric (initial stress) stiffness matrix
 
@@ -118,21 +118,35 @@ print("Stress solved")  #Stress = D x strain
 # plot the deformation, u on the mesh
 EF = 1                                              # Exageration Factor
 nx, ny, ux, uy  = np.zeros(4), np.zeros(4), np.zeros(4), np.zeros(4)
-u_x = [num for i, num in enumerate(u) if i % 2 == 0]    # x component deformations
-u_y = [num for i, num in enumerate(u) if i % 2 == 1]    # y component deformations
-
+u_x = [num for i, num in enumerate(u) if i % 2 == 0]    # x component deformations for each node
+u_y = [num for i, num in enumerate(u) if i % 2 == 1]    # y component deformations for each node
+colourlinspace = [0,  1]
+maxfound, minfound = 0,1
 for i in range(nelem):
     for j in range(4):
         nx[j] = globalNodeCoor[elemconnect[i,j], 0]            
         ny[j] = globalNodeCoor[elemconnect[i,j], 1]
         ux[j] =            u_x[elemconnect[i,j]]
         uy[j] =            u_y[elemconnect[i,j]]
-        color = (u_x[j] + u_y[j], 0.0, 0.0)             # set colour scheme to be a measure of deformation (green to red coloours bar), RGB tuple format
-        if j > 0 :
-            plt.plot([nx[j-1]+ux[j-1]*EF,nx[j]+ux[j]*EF],[ny[j-1]+uy[j-1]*EF,ny[j]+uy[j]*EF], color)   #plot a line of the quadrangular element
-        if j == 3 :
-            plt.plot([nx[0]+ux[0]*EF,nx[3]+ux[3]*EF],[ny[0]+uy[0]*EF,ny[3]+uy[3]*EF], color)           #plot the line of the quadrangular element from the first node to the last
+        #c     = ux[j] + uy[j]
+        #if c > maxfound :
+        #    maxfound = c
+        #if c < minfound :
+        #    minfound = c
+        mini = -1.1668924815353183e-11
+        maxi = 3.926118295407239e-09
+        ratio = 2 * (ux[j]+uy[j]-mini) / (maxi - mini)
+        b = min(1, max(0, (1 - ratio)))
+        r = min(1, max(0, (ratio - 1)))
+        g = min(1, max(0, 1 - b - r))
 
+        if j > 0 :
+            plt.plot([nx[j-1]+ux[j-1]*EF,nx[j]+ux[j]*EF],[ny[j-1]+uy[j-1]*EF,ny[j]+uy[j]*EF], color = (r, g, b))   #plot a line of the quadrangular element
+        if j == 3 :
+            plt.plot([nx[0]+ux[0]*EF,nx[3]+ux[3]*EF],[ny[0]+uy[0]*EF,ny[3]+uy[3]*EF], color = (r, g, b))           #plot the line of the quadrangular element from the first node to the last
+                                                                                                                         # set colour scheme to be a measure of deformation (green to red coloours bar), RGB tuple format
+print(maxfound)
+print(minfound)
 plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'ro', markersize = 0.5) # plots deformations + initial position
 plt.show()
 
