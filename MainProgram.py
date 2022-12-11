@@ -121,7 +121,7 @@ nx, ny, ux, uy  = np.zeros(4), np.zeros(4), np.zeros(4), np.zeros(4)
 u_x = [num for i, num in enumerate(u) if i % 2 == 0]    # x component deformations for each node
 u_y = [num for i, num in enumerate(u) if i % 2 == 1]    # y component deformations for each node
 colourlinspace = [0,  1]
-maxfound, minfound = 0,1
+#maxfound, minfound = 0,1
 for i in range(nelem):
     for j in range(4):
         nx[j] = globalNodeCoor[elemconnect[i,j], 0]            
@@ -133,8 +133,8 @@ for i in range(nelem):
         #    maxfound = c
         #if c < minfound :
         #    minfound = c
-        mini = -1.1668924815353183e-11
-        maxi = 3.926118295407239e-09
+        mini = -1.1668924815353183e-11      #minimum deformation found in abisheks mesh with normal force, hardcoded colourmap
+        maxi = 3.926118295407239e-09        #maximum deformation found in abisheks mesh with normal force
         ratio = 2 * (ux[j]+uy[j]-mini) / (maxi - mini)
         b = min(1, max(0, (1 - ratio)))
         r = min(1, max(0, (ratio - 1)))
@@ -145,43 +145,12 @@ for i in range(nelem):
         if j == 3 :
             plt.plot([nx[0]+ux[0]*EF,nx[3]+ux[3]*EF],[ny[0]+uy[0]*EF,ny[3]+uy[3]*EF], color = (r, g, b))           #plot the line of the quadrangular element from the first node to the last
                                                                                                                          # set colour scheme to be a measure of deformation (green to red coloours bar), RGB tuple format
-print(maxfound)
-print(minfound)
+#print(maxfound)
+#print(minfound)
 plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'ro', markersize = 0.5) # plots deformations + initial position
 plt.show()
 
 # plot the stress, st
 
 
-
-"""
-###### Abishek Lab 3, Code to output plot of deformation #########
-from matplotlib.tri import Triangulation
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import numpy as np
-import meshio
-filenm = 'data.mat'
-mesh = meshio.read(filenm)                                  # optionally specify file_format
-mesh.cell_data                                              # reveals all physical tags
-mesh.cell_data['line']['gmsh:physical']                     # following shows the physical tags (1: bc, 2: load)
-meshvtk = meshio.Mesh(mesh.points, mesh.cells)              # write the mesh in vtk format for visualization in Paraview (for e.g.)
-meshio.write("simpleModMeshio.vtk", meshvtk)
-triang = Triangulation(mesh.points[:,0], mesh.points[:,1])
-circx, circy = 0.4, 0.0
-min_radius = 0.15
-triang.set_mask(np.hypot((mesh.points[:,0]-circx)[triang.triangles].mean(axis=1),(mesh.points[:,1]-circy)[triang.triangles].mean(axis=1))< min_radius)
-dax, day = 0.0, 0.0
-zarbit = np.hypot(mesh.points[:,0] - dax, mesh.points[:,1] - day)
-fig, ax = plt.subplots()
-ax.set_aspect('equal')
-ax.use_sticky_edges = False                                 # Enforce the margins, and enlarge them to give room for the vectors.
-ax.margins(0.07)
-ax.triplot(triang, lw=0.5, color='1.0')                     # The blank mesh
-levels = np.arange(0., 1., 0.025)
-cmap = cm.get_cmap(name='terrain', lut=None)
-ax.tricontourf(triang, zarbit, levels = levels, cmap = cmap)
-ax.tricontour (triang, zarbit, levels = levels, colors = ['0.25', '0.5', '0.5', '0.5', '0.5'], linewidths = [1.0, 0.5, 0.5, 0.5, 0.5])
-plt.show()
-"""
 print("End of Program\n\n\n")
