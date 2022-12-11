@@ -25,11 +25,13 @@ print("data imported")                    # Array storing xy coordinates of the 
 
 # Plot the Mesh and output to user
 colour = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'}
-nx = ny = np.zeros(4) 
+nx = np.zeros(4)
+ny = np.zeros(4) 
+plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1],'ro', markersize=0.5) # plots the points 
 for i in range(nelem):
     color = colour[elemconnect[i,4]]
     for j in range(4):
-        nx[j] = globalNodeCoor[elemconnect[i,j], 0]     # not getting the desired value yet, i want the x co-ordinate of the elements jth node 
+        nx[j] = globalNodeCoor[elemconnect[i,j], 0]            # not getting the desired value yet, i want the x co-ordinate of the elements jth node 
         ny[j] = globalNodeCoor[elemconnect[i,j], 1]
         if j > 0 :
             plt.plot([nx[j-1],nx[j]],[ny[j-1],ny[j]], color)   #plot a line of the quadrangular element
