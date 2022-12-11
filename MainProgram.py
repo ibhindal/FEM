@@ -102,11 +102,12 @@ for i in range(nelem):                                  # for each element
         except:                                         # first trebecular element found 
             a = i
             continue
-topnodeTr      = 2*a+1                                  # index of the top node of the trebecular bone #Isaac: i think *2 for force fx and fy, +1 is for the y component
-topnodeHead    = 2*np.max(elemconnect[:,1]) + 1         # top node of the implant head == top node
-F              = np.zeros(K_bc.shape[0])                # Global Force vector  
-F[topnodeTr]   =  1.0                                   # upward force at trebecular
-F[topnodeHead] = -1.0                                   # downward force at the head
+topnodeTr        = 2*a+1                                  # index of the top node of the trebecular bone #Isaac: i think *2 for force fx and fy, +1 is for the y component
+topnodeHead      = 2*np.max(elemconnect[:,1]) + 1         # top node of the implant head == top node
+F                = np.zeros(K_bc.shape[0])                # Global Force vector  
+F[topnodeTr]     =  1.0                                   # upward force at trebecular
+F[topnodeHead]   = -1.0                                   # downward force at the head
+F[topnodeHead-1] =  1.0                                   # force in x direction at the head
 print("Forces and boundary conditions determined")
 
 u = sp.sparse.linalg.spsolve(K_bc, F)                   # Calculate the force matrix then we need to plot u #isaac:What?
@@ -137,10 +138,6 @@ plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'ro', markersize 
 plt.show()
 
 # plot the stress, st
-
-
-# extract necessary data
-
 
 
 
