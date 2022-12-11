@@ -3,10 +3,9 @@ Calculate the Gauss Quadrature points & weights
 @author: abhishek
 Edited by group 4
 """
-# notes no error catchment for non int npts, or outside of range 2 - 6
+# notes no error catchment for non int npts, or non quadrangular
 
 import numpy as np
-from numpy import *
 
 def GaussQuad(npts=4) :
     """
@@ -17,7 +16,7 @@ def GaussQuad(npts=4) :
         point : vector quadrature points (npts)
         weit  : vector quadrature weights (npts)
     """
-    point = weit = zeros(4)          #initialize vector size
+    point, weit = np.zeros(4),np.zeros(4)       #initialize vector size
     point[0], point[1] = 0.861136311590453,  0.339981043583856
     point[2], point[3] = -point[1], -point[0]
     weit[0],  weit[1]  = 0.347854845137454, 0.652145154862526

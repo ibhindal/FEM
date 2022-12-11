@@ -71,7 +71,7 @@ for i in range(nelem) :                             # for each element
     E = Mat_Prop_Dict[Material[MatNo]][0]           # Youngs modulus of current material
     v = Mat_Prop_Dict[Material[MatNo]][1]           # Poissions ratio of current material
     nodeXY = globalNodeCoor[elemconnect[i,0:4].T,:] # finds the node coordinates of current element
-    ke = kecalc(npts,E,v,nodeXY)          # calculates the element siffness matrix
+    ke = kecalc(npts,E,v,nodeXY)                    # calculates the element siffness matrix
                                                         # ke: elastic stiffness matrix 
     Kg = assembleSys(Kg,ke,elemconnect[i,0:4])      # geometric (initial stress) stiffness matrix
 
