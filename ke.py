@@ -37,6 +37,6 @@ def kecalc(npts,E,v,xyel):
             B  = B_function(sn, dndx, dnde ,xyel)               # the B matrix from point i to point j
             ke = ke + np.dot(np.dot(B.T, dmat), B) * detj * wti * wtj   # elastic stiffness matrix, square matrix
             
-            #DdotB = np.dot(dmat, B)
+            DdotB = np.dot(dmat, B)
         # print('KeCalc - Completed!')
-    return ke, dmat, B
+    return ke, DdotB #dmat, B

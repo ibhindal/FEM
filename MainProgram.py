@@ -67,29 +67,29 @@ print("Material properties determined")
 shapefundx = shapefunde = jacob = []                # shape function (dx), shape function (de), Jacobian (will store the jacibian, inverse jacobian and determinate)        
 Kg         = sp.sparse.csr_matrix((ndof,ndof))      # geometric (initial stress) stiffness matrix
 StressDB   = []
-Dtemp      = np.zeros([3,3])                        # Local element D matrix
-Btemp      = np.zeros([3,8])                        # local B matrix
-D          = np.zeros([3*nnodes, 3*nnodes])         # Global D matrix
-B          = np.zeros([3*nnodes, 8*nnodes])         # Gloabl B matrix
+#Dtemp      = np.zeros([3,3])                        # Local element D matrix
+#Btemp      = np.zeros([3,8])                        # local B matrix
+#D          = np.zeros([3*nnodes, 3*nnodes])         # Global D matrix
+#B          = np.zeros([3*nnodes, 8*nnodes])         # Gloabl B matrix
 
 for i in range(nelem) :                             # for each element                  
     MatNo = elemconnect[i,4]    
     E = Mat_Prop_Dict[Material[MatNo]][0]           # Youngs modulus of current material
     v = Mat_Prop_Dict[Material[MatNo]][1]           # Poissions ratio of current material
     nodeXY = globalNodeCoor[elemconnect[i,0:4].T,:] # finds the node coordinates of current element
-    ke, Dtemp, Btemp = kecalc(npts,E,v,nodeXY)      # calculates the element siffness matrix and D dot B (for stress)
+    ke, DDotB = kecalc(npts,E,v,nodeXY)      # calculates the element siffness matrix and D dot B (for stress) #Dtemp, Btemp
                                                         # ke: elastic stiffness matrix
 
-    D[elemconnect[i,0], elemconnect[i,1]] = D[elemconnect[i,1], elemconnect[i,0]] = Dtemp[0,0] + D[elemconnect[i,1], elemconnect[i,0]]
-    D[elemconnect[i,0], elemconnect[i,1]] = D[elemconnect[i,1], elemconnect[i,0]] = Dtemp[0,1] + D[elemconnect[i,1], elemconnect[i,0]]
-    D[elemconnect[i,0], elemconnect[i,1]] = D[elemconnect[i,1], elemconnect[i,0]] = Dtemp[1,0] + D[elemconnect[i,1], elemconnect[i,0]]
-    D[elemconnect[i,0], elemconnect[i,1]] = D[elemconnect[i,1], elemconnect[i,0]] = Dtemp[1,1] + D[elemconnect[i,1], elemconnect[i,0]]
-    D[elemconnect[i,0], elemconnect[i,1]] = D[elemconnect[i,1], elemconnect[i,0]] = Dtemp[2,2] + D[elemconnect[i,1], elemconnect[i,0]]
+    #D[elemconnect[i,0]*3 + 0, elemconnect[i,0]*3 + 0] = Dtemp[0,0] + D[elemconnect[i,0]*3 + 0, elemconnect[i,0]*3 + 0] # 1, v, 0 ; v, 1, 0 ; 0, 0, (1-v)/2
+    #D[elemconnect[i,0]*3 + 0, elemconnect[i,1]*3 + 0] = Dtemp[0,1] + D[elemconnect[i,0]*3 + 0, elemconnect[i,1]*3 + 0]
+    #D[elemconnect[i,1]*3 + 0, elemconnect[i,0]*3 + 0] = Dtemp[0,1] + D[elemconnect[i,1]*3 + 0, elemconnect[i,0]*3 + 0]
+    #D[elemconnect[i,1]*3 + 0, elemconnect[i,1]*3 + 0] = Dtemp[1,1] + D[elemconnect[i,1]*3 + 0, elemconnect[i,1]*3 + 0]
+    #D[elemconnect[i,2]*3 + 0, elemconnect[i,2]*3 + 0] = Dtemp[2,2] + D[elemconnect[i,2]*3 + 0, elemconnect[i,2]*3 + 0]
 
-    B[0,0] = Btemp[0,0]
-    B[0,0] = Btemp[0,0]
+    #B[0,0] = Btemp[0,0]
+    #B[0,0] = Btemp[0,0]
     # ...
-    
+
     #StressDB.append(DdotB)                         # Saves D dot B                                     
     Kg = assembleSys(Kg,ke,elemconnect[i,0:4])      # geometric (initial stress) stiffness matrix
 
@@ -177,7 +177,7 @@ plt.show()
 # solve stresses
 stress = []
 
-stress = np.dot(np.dot(D,B),ue)
+#stress = np.dot(np.dot(D,B),ue)
 
 for i in range(nelem):
     ueT = np.transpose(ue[i])       # Transpose ue to become column vector
