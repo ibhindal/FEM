@@ -63,8 +63,7 @@ nodeCoor = []                           # node coordinate, holding value for the
 
 
 # initializes variables     
-shapefundx = shapefunde = jacob = []                # shape function (dx), shape function (de), Jacobian (will store the jacibian, inverse jacobian and determinate)
-D          = np.zeros(nelem)                        # D matrix, in vector form, a (1 x nelem) matrix          
+shapefundx = shapefunde = jacob = []                # shape function (dx), shape function (de), Jacobian (will store the jacibian, inverse jacobian and determinate)        
 Kg         = sp.sparse.csr_matrix((ndof,ndof))      # geometric (initial stress) stiffness matrix
 
 for i in range(nelem) :                             # for each element                  
@@ -74,7 +73,6 @@ for i in range(nelem) :                             # for each element
     nodeXY = globalNodeCoor[elemconnect[i,0:4].T,:] # finds the node coordinates of current element
     ke = kecalc(npts,E,v,nodeXY)                    # calculates the element siffness matrix
                                                         # ke: elastic stiffness matrix 
-                                                        # D : the D matrix in tensor form, stress = D x strain
     Kg = assembleSys(Kg,ke,elemconnect[i,0:4])      # geometric (initial stress) stiffness matrix
 
 plt.spy(Kg, markersize=0.1)                         # plots the matrix showing sparcity?
@@ -94,25 +92,25 @@ plt.show()
 flnmfig = "sparsity_K_beforeBC.png"
 plt.savefig(flnmfig)
 
-a = float('-inf')                                       # holds the index of the top node of the trebecular material
-for i in range(nelem):                                  # for each element
-    if (3 == elemconnect[i,4]):                         # check element is the correct material
+a = float('-inf')                                   # holds the index of the top node of the trebecular material
+for i in range(nelem):                              # for each element
+    if (3 == elemconnect[i,4]):                     # check element is the correct material
         try:
             if (globalNodeCoor[a,1] < globalNodeCoor[i,1]): # check element is higher than the last 
                 a = i                                       # update a to have the new highest found element
         except:                                         # first trebecular element found 
             a = i
             continue
-topnodeTr      = 2*a+1                                  # index of the top node of the trebecular bone #Isaac: i think *2 for force fx and fy, +1 is for the y component
-topnodeHead    = 2*np.max(elemconnect[:,1]) + 1         # top node of the implant head == top node
-F              = np.zeros(K_bc.shape[0])                # Global Force vector  
-F[topnodeTr]   =  1.0                                   # upward force at trebecular
-F[topnodeHead] = -1.0                                   # downward force at the head
+topnodeTr        = 2*a+1                            # index of the top node of the trebecular bone #Isaac: i think *2 for force fx and fy, +1 is for the y component
+topnodeHead      = 2*np.max(elemconnect[:,1]) + 1   # top node of the implant head == top node
+F                = np.zeros(K_bc.shape[0])          # Global Force vector  
+F[topnodeTr]     =  1.0                             # upward force at trebecular
+F[topnodeHead]   = -1.0                             # downward force at the head
+F[topnodeHead-1] =  1.0                             # force in x direction at the head
 print("Forces and boundary conditions determined")
 
-u = sp.sparse.linalg.spsolve(K_bc, F)                   # Calculate the force matrix then we need to plot u #isaac:What?
-print("Deformation solved")                             # calulates the displacement/ deformation
-
+u = sp.sparse.linalg.spsolve(K_bc, F)               # Calculate the force matrix then we need to plot u #isaac:What?
+print("Deformation solved")                         # Calulates the displacement/ deformation
 st = 1                                                  
 print("Stress solved")  #Stress = D x strain 
 
@@ -120,46 +118,50 @@ print("Stress solved")  #Stress = D x strain
 EF = 1                                                  # Exageration Factor # Isobel: don't think this is used at the moment
 u_x = [num for i, num in enumerate(u) if i % 2 == 0]    # x component deformations
 u_y = [num for i, num in enumerate(u) if i % 2 == 1]    # y component deformations
+
+=======
+st = 1
+#stress =  D[]. B[] . u
+print("Stress solved")  #Stress = D x strain 
+
+# plot the deformation, u on the mesh
+EF = 1                                              # Exageration Factor
+nx, ny, ux, uy  = np.zeros(4), np.zeros(4), np.zeros(4), np.zeros(4)
+u_x = [num for i, num in enumerate(u) if i % 2 == 0]    # x component deformations for each node
+u_y = [num for i, num in enumerate(u) if i % 2 == 1]    # y component deformations for each node
+colourlinspace = [0,  1]
+#maxfound, minfound = 0,1
+for i in range(nelem):
+    for j in range(4):
+        nx[j] = globalNodeCoor[elemconnect[i,j], 0]            
+        ny[j] = globalNodeCoor[elemconnect[i,j], 1]
+        ux[j] =            u_x[elemconnect[i,j]]
+        uy[j] =            u_y[elemconnect[i,j]]
+        #c     = ux[j] + uy[j]
+        #if c > maxfound :
+        #    maxfound = c
+        #if c < minfound :
+        #    minfound = c
+        mini = -1.1668924815353183e-11      #minimum deformation found in abisheks mesh with normal force, hardcoded colourmap
+        maxi = 3.926118295407239e-09        #maximum deformation found in abisheks mesh with normal force
+        ratio = 2 * (ux[j]+uy[j]-mini) / (maxi - mini)
+        b = min(1, max(0, (1 - ratio)))
+        r = min(1, max(0, (ratio - 1)))
+        g = min(1, max(0, 1 - b - r))
+
+        if j > 0 :
+            plt.plot([nx[j-1]+ux[j-1]*EF,nx[j]+ux[j]*EF],[ny[j-1]+uy[j-1]*EF,ny[j]+uy[j]*EF], color = (r, g, b))   #plot a line of the quadrangular element
+        if j == 3 :
+            plt.plot([nx[0]+ux[0]*EF,nx[3]+ux[3]*EF],[ny[0]+uy[0]*EF,ny[3]+uy[3]*EF], color = (r, g, b))           #plot the line of the quadrangular element from the first node to the last
+                                                                                                                         # set colour scheme to be a measure of deformation (green to red coloours bar), RGB tuple format
+#print(maxfound)
+#print(minfound)
+
 plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'ro', markersize = 0.5) # plots deformations + initial position
 plt.show()
 
 # plot the stress, st
 
 
-# extract necessary data
-
-
-
-
-"""
-###### Abishek Lab 3, Code to output plot of deformation #########
-from matplotlib.tri import Triangulation
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import numpy as np
-import meshio
-filenm = 'data.mat'
-mesh = meshio.read(filenm)                                  # optionally specify file_format
-mesh.cell_data                                              # reveals all physical tags
-mesh.cell_data['line']['gmsh:physical']                     # following shows the physical tags (1: bc, 2: load)
-meshvtk = meshio.Mesh(mesh.points, mesh.cells)              # write the mesh in vtk format for visualization in Paraview (for e.g.)
-meshio.write("simpleModMeshio.vtk", meshvtk)
-triang = Triangulation(mesh.points[:,0], mesh.points[:,1])
-circx, circy = 0.4, 0.0
-min_radius = 0.15
-triang.set_mask(np.hypot((mesh.points[:,0]-circx)[triang.triangles].mean(axis=1),(mesh.points[:,1]-circy)[triang.triangles].mean(axis=1))< min_radius)
-dax, day = 0.0, 0.0
-zarbit = np.hypot(mesh.points[:,0] - dax, mesh.points[:,1] - day)
-fig, ax = plt.subplots()
-ax.set_aspect('equal')
-ax.use_sticky_edges = False                                 # Enforce the margins, and enlarge them to give room for the vectors.
-ax.margins(0.07)
-ax.triplot(triang, lw=0.5, color='1.0')                     # The blank mesh
-levels = np.arange(0., 1., 0.025)
-cmap = cm.get_cmap(name='terrain', lut=None)
-ax.tricontourf(triang, zarbit, levels = levels, cmap = cmap)
-ax.tricontour (triang, zarbit, levels = levels, colors = ['0.25', '0.5', '0.5', '0.5', '0.5'], linewidths = [1.0, 0.5, 0.5, 0.5, 0.5])
-plt.show()
-"""
 print("End of Program\n\n\n")
 
