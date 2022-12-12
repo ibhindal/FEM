@@ -1,7 +1,7 @@
 #Main Program
-import os
+#import os
 import numpy as np
-import assembleSys
+#import assembleSys # Gets imported below
 import scipy as sp
 import scipy.io as spio
 from ke import kecalc
@@ -16,37 +16,12 @@ mat = spio.loadmat(Meshfilename, squeeze_me=(True))
 print("\n\n\nfile Loaded")
 
 # Assigning variables to the data imported from MATLAB
-globalNodeCoor = mat['nodecoor']
-elemconnect    = mat['elemconnect'] - 1
+globalNodeCoor = mat['nodecoor']    
+elemconnect    = mat['elemconnect'] - 1     # Material number
 nnodes         = globalNodeCoor.shape[0]  # Total number of nodes in mesh  
 nelem          = elemconnect.shape[0]     # Total number of elements in mesh
 elemNodeCoor   = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
 print("data imported")                    # Array storing xy coordinates of the 4 nodes in an element
-
-# Plot the Mesh and output to user
-colour = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'}
-nx, ny = np.zeros(4), np.zeros(4) 
-plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1],'ro', markersize=0.5) # plots the points 
-for i in range(nelem):
-    color = colour[elemconnect[i,4]]
-    for j in range(4):
-        nx[j] = globalNodeCoor[elemconnect[i,j], 0]            
-        ny[j] = globalNodeCoor[elemconnect[i,j], 1]
-        if j > 0 :
-            plt.plot([nx[j-1],nx[j]],[ny[j-1],ny[j]], color)   #plot a line of the quadrangular element
-        if j == 3 :
-            plt.plot([nx[0],nx[3]],[ny[0],ny[3]], color)       #plot the line of the quadrangular element from the first node to the last
-
-#plt.plot(nx,ny) # trying to plot the mesh with element lines 
-plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1],'ro', markersize=0.5) # plots the points 
-plt.show()
-
-#initialising variables and constants 
-dofpn    = 2                            # degrees of freedom per node, x co-or and y co-or
-npts     = 4                            # number of points per element
-ndof     = nnodes*dofpn                 # total number of dof
-nodeCoor = []                           # node coordinate, holding value for the current node                             
-
 # Young's Modulus and Poission's Ratio for different materials 
 E_head        = 2.1e11
 nu_head       = 0.3
@@ -60,7 +35,32 @@ E_marrow      = 3.0e8
 nu_marrow     = 0.45
 Mat_Prop_Dict = {"Head" : [E_head, nu_head], "Stem" : [E_stem, nu_stem], "Cortical":[E_cortical,nu_cortical], "Trebecular":[E_trebecular,nu_trebecular], "Marrow":[E_marrow,nu_marrow]}
 Material      = {0 : "Head", 1 : "Stem", 2 : "Cortical", 3 : "Trebecular", 4 : "Marrow"}
-print("Matrial properties determined")
+print("Material properties determined")
+
+# Plot the Mesh and output to user
+colour = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'}
+nx = ny = np.zeros(4) 
+for i in range(nelem):                  # For every element, connect the nodes
+    color = colour[elemconnect[i,4]]    # Assign colour of line based on material
+    for j in range(4):
+        nx[j] = globalNodeCoor[elemconnect[i,j], 0]     # not getting the desired value yet, i want the x co-ordinate of the elements jth node 
+        ny[j] = globalNodeCoor[elemconnect[i,j], 1]
+        if j > 0 :
+            plt.plot([nx[j-1],nx[j]],[ny[j-1],ny[j]], color)   #plot a line of the quadrangular element
+        if j == 3 :
+            plt.plot([nx[0],nx[3]],[ny[0],ny[3]], color)       #plot the line of the quadrangular element from the first node to the last
+
+#plt.plot(nx,ny) # trying to plot the mesh with element lines 
+plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1],'ro', markersize=0.5) # plots the points 
+plt.title("Mesh")
+plt.show()
+
+#initialising variables and constants 
+dofpn    = 2                            # degrees of freedom per node, x co-or and y co-or
+npts     = 4                            # number of points per element
+ndof     = nnodes*dofpn                 # total number of dof
+nodeCoor = []                           # node coordinate, holding value for the current node                             
+
 
 # initializes variables     
 shapefundx = shapefunde = jacob = []                # shape function (dx), shape function (de), Jacobian (will store the jacibian, inverse jacobian and determinate)        
@@ -75,7 +75,8 @@ for i in range(nelem) :                             # for each element
                                                         # ke: elastic stiffness matrix 
     Kg = assembleSys(Kg,ke,elemconnect[i,0:4])      # geometric (initial stress) stiffness matrix
 
-plt.spy(Kg, markersize=0.1)                         # plots the mattrix showing sparcity?
+plt.spy(Kg, markersize=0.1)                         # plots the matrix showing sparcity?
+plt.title("Stiffness Matrices")
 plt.show()
 print('Stiffness Matrices calculated')
 
@@ -110,7 +111,15 @@ print("Forces and boundary conditions determined")
 
 u = sp.sparse.linalg.spsolve(K_bc, F)               # Calculate the force matrix then we need to plot u #isaac:What?
 print("Deformation solved")                         # Calulates the displacement/ deformation
+st = 1                                                  
+print("Stress solved")  #Stress = D x strain 
 
+# plot the deformation, u
+EF = 1                                                  # Exageration Factor # Isobel: don't think this is used at the moment
+u_x = [num for i, num in enumerate(u) if i % 2 == 0]    # x component deformations
+u_y = [num for i, num in enumerate(u) if i % 2 == 1]    # y component deformations
+
+=======
 st = 1
 #stress =  D[]. B[] . u
 print("Stress solved")  #Stress = D x strain 
@@ -147,6 +156,7 @@ for i in range(nelem):
                                                                                                                          # set colour scheme to be a measure of deformation (green to red coloours bar), RGB tuple format
 #print(maxfound)
 #print(minfound)
+
 plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'ro', markersize = 0.5) # plots deformations + initial position
 plt.show()
 
@@ -154,3 +164,4 @@ plt.show()
 
 
 print("End of Program\n\n\n")
+
