@@ -66,31 +66,17 @@ print("Material properties determined")
 # initializes variables     
 shapefundx = shapefunde = jacob = []                # shape function (dx), shape function (de), Jacobian (will store the jacibian, inverse jacobian and determinate)        
 Kg         = sp.sparse.csr_matrix((ndof,ndof))      # geometric (initial stress) stiffness matrix
-StressDB   = []
-#Dtemp      = np.zeros([3,3])                        # Local element D matrix
-#Btemp      = np.zeros([3,8])                        # local B matrix
-#D          = np.zeros([3*nnodes, 3*nnodes])         # Global D matrix
-#B          = np.zeros([3*nnodes, 8*nnodes])         # Gloabl B matrix
+StressDB   = np.zeros([nelem, 3, 8])
 
 for i in range(nelem) :                             # for each element                  
     MatNo = elemconnect[i,4]    
     E = Mat_Prop_Dict[Material[MatNo]][0]           # Youngs modulus of current material
     v = Mat_Prop_Dict[Material[MatNo]][1]           # Poissions ratio of current material
     nodeXY = globalNodeCoor[elemconnect[i,0:4].T,:] # finds the node coordinates of current element
-    ke, DDotB = kecalc(npts,E,v,nodeXY)      # calculates the element siffness matrix and D dot B (for stress) #Dtemp, Btemp
+    ke, DDotB = kecalc(npts,E,v,nodeXY)             # calculates the element siffness matrix and D dot B (for stress)
                                                         # ke: elastic stiffness matrix
 
-    #D[elemconnect[i,0]*3 + 0, elemconnect[i,0]*3 + 0] = Dtemp[0,0] + D[elemconnect[i,0]*3 + 0, elemconnect[i,0]*3 + 0] # 1, v, 0 ; v, 1, 0 ; 0, 0, (1-v)/2
-    #D[elemconnect[i,0]*3 + 0, elemconnect[i,1]*3 + 0] = Dtemp[0,1] + D[elemconnect[i,0]*3 + 0, elemconnect[i,1]*3 + 0]
-    #D[elemconnect[i,1]*3 + 0, elemconnect[i,0]*3 + 0] = Dtemp[0,1] + D[elemconnect[i,1]*3 + 0, elemconnect[i,0]*3 + 0]
-    #D[elemconnect[i,1]*3 + 0, elemconnect[i,1]*3 + 0] = Dtemp[1,1] + D[elemconnect[i,1]*3 + 0, elemconnect[i,1]*3 + 0]
-    #D[elemconnect[i,2]*3 + 0, elemconnect[i,2]*3 + 0] = Dtemp[2,2] + D[elemconnect[i,2]*3 + 0, elemconnect[i,2]*3 + 0]
-
-    #B[0,0] = Btemp[0,0]
-    #B[0,0] = Btemp[0,0]
-    # ...
-
-    #StressDB.append(DdotB)                         # Saves D dot B                                     
+    StressDB[i, :, :] = DDotB                       # Saves D dot B                                     
     Kg = assembleSys(Kg,ke,elemconnect[i,0:4])      # geometric (initial stress) stiffness matrix
 
 plt.spy(Kg, markersize=0.1)                         # plots the mattrix showing sparcity?
@@ -113,34 +99,34 @@ plt.savefig(flnmfig)
 
 a = float('-inf')                                   # holds the index of the top node of the trebecular material
 for i in range(nelem):                              # for each element
-    if (3 == elemconnect[i,4]):                     # check element is the correct material
-        try:
-            if (globalNodeCoor[a,1] < globalNodeCoor[i,1]): # check element is higher than the last 
-                a = i                                       # update a to have the new highest found element
-        except:                                         # first trebecular element found 
-            a = i
-            continue
+    if (2 == elemconnect[i,4]):                     # check element is the correct material
+        for j in range(4):
+            try:
+                if (globalNodeCoor[a,1] < globalNodeCoor[elemconnect[i,j],1]): # check element is higher than the last 
+                    a = i*4 + j                                       # update a to have the new highest found element
+            except:                                         # first trebecular element found 
+                a = i
+                continue
 topnodeTr        = 2*a+1                            # index of the top node of the trebecular bone #Isaac: i think *2 for force fx and fy, +1 is for the y component
-topnodeHead      = 2*np.max(elemconnect[:,1]) + 1   # top node of the implant head == top node
+topnodeHead      = 2*np.where(elemconnect[:,1] == elemconnect[:,1].max()) + 1   # top node of the implant head == top node
 F                = np.zeros(K_bc.shape[0])          # Global Force vector  
-F[topnodeTr]     =  1.0                             # upward force at trebecular
-F[topnodeHead]   = -1.0                             # downward force at the head
-F[topnodeHead-1] =  1.0                             # force in x direction at the head
+F[topnodeTr]     = +1607                                # upward force at trebecular
+F[topnodeHead]   = -1607                             # downward force at the head
+F[topnodeHead-1] = +373                       # force in x direction at the head
 print("Forces and boundary conditions determined")
 
 u = sp.sparse.linalg.spsolve(K_bc, F)               # Calculate the force matrix then we need to plot u #isaac:What?
+u_x = [num for i, num in enumerate(u) if i % 2 == 0]# x component deformations for each node
+u_y = [num for i, num in enumerate(u) if i % 2 == 1]# y component deformations for each node
 print("Deformation solved")                         # Calulates the displacement/ deformation
-
-
 
 # plot the deformation, u on the mesh
 EF = 1                                              # Exageration Factor
 nx, ny, ux, uy  = np.zeros(4), np.zeros(4), np.zeros(4), np.zeros(4)
-u_x = [num for i, num in enumerate(u) if i % 2 == 0]    # x component deformations for each node
-u_y = [num for i, num in enumerate(u) if i % 2 == 1]    # y component deformations for each node
-#maxfound, minfound = 0,1
 
-ue = []
+DeformationSum = [sum(i) for i in zip(u_x, u_y)]
+mini = min(DeformationSum)      #minimum deformation found in abisheks mesh with normal force, hardcoded colourma
+maxi = max(DeformationSum) 
 
 for i in range(nelem):
     for j in range(4):
@@ -148,14 +134,7 @@ for i in range(nelem):
         ny[j] = globalNodeCoor[elemconnect[i,j], 1]
         ux[j] =            u_x[elemconnect[i,j]]
         uy[j] =            u_y[elemconnect[i,j]]
-        
-        #c     = ux[j] + uy[j]
-        #if c > maxfound :
-        #    maxfound = c
-        #if c < minfound :
-        #    minfound = c
-        mini = -1.1668924815353183e-11      #minimum deformation found in abisheks mesh with normal force, hardcoded colourmap
-        maxi = 3.926118295407239e-09        #maximum deformation found in abisheks mesh with normal force
+       #maximum deformation found in abisheks mesh with normal force
         ratio = 2 * (ux[j]+uy[j]-mini) / (maxi - mini)
         b = min(1, max(0, (1 - ratio)))
         r = min(1, max(0, (ratio - 1)))
@@ -165,27 +144,60 @@ for i in range(nelem):
             plt.plot([nx[j-1]+ux[j-1]*EF,nx[j]+ux[j]*EF],[ny[j-1]+uy[j-1]*EF,ny[j]+uy[j]*EF], color = (r, g, b))   #plot a line of the quadrangular element
         if j == 3 :
             plt.plot([nx[0]+ux[0]*EF,nx[3]+ux[3]*EF],[ny[0]+uy[0]*EF,ny[3]+uy[3]*EF], color = (r, g, b))           #plot the line of the quadrangular element from the first node to the last
-    
-    ue.append(np.array([ux[0], uy[0], ux[1], uy[1], ux[2], uy[2], ux[3], uy[3]]))       # Save u values in format needed for stress calculation
                                                                                                                         # set colour scheme to be a measure of deformation (green to red coloours bar), RGB tuple format
-#print(maxfound)
-#print(minfound)
-plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'ro', markersize = 0.5) # plots deformations + initial position
+print('Maximum deformation {}'.format(maxi))
+print('Minimum deformation {}'.format(mini))
+
+plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'bo', markersize = 0.5) # plots deformations + initial position
+plt.plot(u_x + globalNodeCoor[a,0], u_y + globalNodeCoor[a,1], 'ro', markersize = 5) # plots deformations + initial position
+plt.plot(u_x + globalNodeCoor[elemconnect[:,1].index(max(elemconnect[:,1])),0], u_y + globalNodeCoor[elemconnect[:,1].index(max(elemconnect[:,1])),1], 'ro', markersize = 5) # plots deformations + initial position
+
+
 plt.title("Deformation of mesh")
 plt.show()
 
 # solve stresses
-stress = []
-
-#stress = np.dot(np.dot(D,B),ue)
-
+stress = np.zeros(nelem*3)
+ueT = np.zeros(8)
 for i in range(nelem):
-    ueT = np.transpose(ue[i])       # Transpose ue to become column vector
-    stressdb = StressDB[i]
-    stress.append(np.dot(stressdb, ueT))    # Dot of DdotB and ue to get stresses
+    ueT = np.transpose([u_x[elemconnect[i,0]], u_y[elemconnect[i,0]],
+                        u_x[elemconnect[i,1]], u_y[elemconnect[i,1]],
+                        u_x[elemconnect[i,2]], u_y[elemconnect[i,2]],
+                        u_x[elemconnect[i,3]], u_y[elemconnect[i,3]]])       # Transpose ue to become column vector
+    stress[i*3 : i*3 + 3] = (np.dot(StressDB[i, :, :], ueT))    # Dot of DdotB and ue to get stresses
 print("Stresses solved")
 
 # plot the stresses, stress on the mesh
+EF = 1                                                # Exageration Factor
+st_x  = [num for i, num in enumerate(stress) if i % 3 == 0]# x component deformations for each node
+st_y  = [num for i, num in enumerate(stress) if i % 3 == 1]# 
+st_xy = [num for i, num in enumerate(stress) if i % 3 == 2]# 
+stressSum = [sum(i) for i in zip(st_x, st_y, st_xy)]
+mini = min(stressSum)                          # minimum stress found in mesh 
+maxi = max(stressSum)                          # maximum stress found in mesh 
+#maxfound, minfound = 0,1
 
+for i in range(nelem):
+    for j in range(4):
+        nx[j] = globalNodeCoor[elemconnect[i,j], 0]            
+        ny[j] = globalNodeCoor[elemconnect[i,j], 1]
+        ux[j] =            u_x[elemconnect[i,j]]
+        uy[j] =            u_y[elemconnect[i,j]]
+        
+        ratio = 2 * (st_x[i] + st_y[i] + st_xy[i] - mini) / (maxi - mini)
+        b = min(1, max(0, (1 - ratio)))
+        r = min(1, max(0, (ratio - 1)))
+        g = min(1, max(0, 1 - b - r))
+
+        if j > 0 :
+            plt.plot([nx[j-1]+ux[j-1]*EF,nx[j]+ux[j]*EF],[ny[j-1]+uy[j-1]*EF,ny[j]+uy[j]*EF], color = (r, g, b))   #plot a line of the quadrangular element
+        if j == 3 :
+            plt.plot([nx[0]+ux[0]*EF,nx[3]+ux[3]*EF],[ny[0]+uy[0]*EF,ny[3]+uy[3]*EF], color = (r, g, b))           #plot the line of the quadrangular element from the first node to the last
+                                                                                                                    # set colour scheme to be a measure of deformation (green to red coloours bar), RGB tuple format
+#print(maxfound)
+#print(minfound)
+plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'bo', markersize = 0.5) # plots deformations + initial position
+plt.title("Stress of mesh")
+plt.show()
 
 print("End of Program\n\n\n")

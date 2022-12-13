@@ -22,7 +22,8 @@ def kecalc(npts,E,v,xyel):
     dmat        = E/((1-v)**2) * np.array([[1, v, 0],[v, 1, 0],[0, 0,((1-v)/2)]])
 
     ke = np.zeros([8,8])
-    Stress = np.zeros(4)
+    #Stress = np.zeros(4)
+    DdotB = np.zeros([3,8])
     count = 0
 
     for i in range(npts) :                                      # for number of points in element
