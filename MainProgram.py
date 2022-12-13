@@ -82,11 +82,11 @@ plt.title("Stiffness matrices")
 plt.show()
 print('Stiffness Matrices calculated')
 
-##### Dirichlet BC (built-in edge y=(min_y)) ####### 
+##### Dirichlet Boundary Condition (built-in edge y=(min_y)) ####### 
 min_y   = np.min(globalNodeCoor[:,1])
 nodesbc = np.where(globalNodeCoor[:,1] == min_y)           # find the nodes on the bottom edge y=(min_y)
 dofbc   = np.c_[2*nodesbc[0], 2*nodesbc[0]+1].flatten()    #
-K_bc    = DirichletBC(Kg,dofbc)                            # system matrix after boundary conditions
+K_bc    = DirichletBC(Kg,dofbc)                            # system matrix after boundary conditions, sets the bottom edge as built in
 
 # Plot the sparsity of the system stiffness matrix
 plt.spy(K_bc, markersize=0.1)
@@ -95,16 +95,17 @@ plt.title("Sparsity of system stiffness matrix")
 flnmfig = "sparsity_K_beforeBC.png"
 plt.savefig(flnmfig)
 
+# Determine forces 
 a = 0                                               # holds the index of the top node of the trebecular material
 first = True
 for i in range(nelem):                              # for each element
-    if (2 == elemconnect[i,4]):                     # check element is the correct material
+    if (2 == elemconnect[i,4]):                     # check element is the correct material (bone)
         for j in range(4):
             if (globalNodeCoor[a,1] < globalNodeCoor[elemconnect[i,j],1]) or first: # check element is higher than the last 
                 a = elemconnect[i,j]                                                # update a to have the new highest found element
                 first = False
 
-b = 0
+b = 0                                               # holds the index of the top node of the head
 for i in range(nnodes):
     if globalNodeCoor[i,1] > globalNodeCoor[b,1]:
         b = i
@@ -114,7 +115,7 @@ topnodeHead      = 2*b + 1                          # top node of the implant he
 F                = np.zeros(K_bc.shape[0])          # Global Force vector  
 F[topnodeTr]     = +1607                            # upward force at trebecular
 F[topnodeHead]   = -1607                            # downward force at the head
-F[topnodeHead-1] = +373                       # force in x direction at the head
+F[topnodeHead-1] = +373                             # force in x direction at the head
 print("Forces and boundary conditions determined")
 
 u = sp.sparse.linalg.spsolve(K_bc, F)               # Calculate the force matrix then we need to plot u #isaac:What?
