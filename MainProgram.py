@@ -37,7 +37,7 @@ for i in range(nelem):
         if j == 3 :
             plt.plot([nx[0],nx[3]],[ny[0],ny[3]], color = color, linewidth=0.5)       #plot the line of the quadrangular element from the first node to the last
 
-plt.title("Mesh of implant")
+plt.title("Mesh of implant and bone")
 plt.show()
 
 #initialising variables and constants 
@@ -176,7 +176,6 @@ st_xy = [num for i, num in enumerate(stress) if i % 3 == 2]#
 stressSum = [sum(i) for i in zip(st_x, st_y, st_xy)]
 mini = min(stressSum)                          # minimum stress found in mesh 
 maxi = max(stressSum)                          # maximum stress found in mesh 
-#maxfound, minfound = 0,1
 
 for i in range(nelem):
     for j in range(4):
@@ -195,8 +194,8 @@ for i in range(nelem):
         if j == 3 :
             plt.plot([nx[0]+ux[0]*EF,nx[3]+ux[3]*EF],[ny[0]+uy[0]*EF,ny[3]+uy[3]*EF], color = (r, g, b))           #plot the line of the quadrangular element from the first node to the last
                                                                                                                     # set colour scheme to be a measure of deformation (green to red coloours bar), RGB tuple format
-#print(maxfound)
-#print(minfound)
+print('Maximum deformation {}'.format(maxi))
+print('Minimum deformation {}'.format(mini))
 plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'bo', markersize = 0.5) # plots deformations + initial position
 plt.title("Stress of mesh")
 plt.show()
