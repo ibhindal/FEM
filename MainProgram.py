@@ -24,9 +24,9 @@ elemNodeCoor   = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded elemen
 print("data imported")                    # Array storing xy coordinates of the 4 nodes in an element
 
 # Plot the Mesh and output to user
-colour = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'}
+colour = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'} # defines a diffrent colour for each material
 nx, ny = np.zeros(4), np.zeros(4) 
-plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1],'ro', markersize=0.5) # plots the points 
+plt.plot(globalNodeCoor[:, 0], globalNodeCoor[:, 1], 'bo', markersize=0.5) # plots the points 
 for i in range(nelem):
     color = colour[elemconnect[i,4]]
     for j in range(4):
@@ -37,8 +37,6 @@ for i in range(nelem):
         if j == 3 :
             plt.plot([nx[0],nx[3]],[ny[0],ny[3]], color)       #plot the line of the quadrangular element from the first node to the last
 
-#plt.plot(nx,ny) # trying to plot the mesh with element lines 
-plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1],'ro', markersize=0.5) # plots the points 
 plt.title("Mesh of implant")
 plt.show()
 
@@ -97,21 +95,25 @@ plt.title("Sparsity of system stiffness matrix")
 flnmfig = "sparsity_K_beforeBC.png"
 plt.savefig(flnmfig)
 
-a = float('-inf')                                   # holds the index of the top node of the trebecular material
+a = 0                                               # holds the index of the top node of the trebecular material
+first = True
 for i in range(nelem):                              # for each element
     if (2 == elemconnect[i,4]):                     # check element is the correct material
         for j in range(4):
-            try:
-                if (globalNodeCoor[a,1] < globalNodeCoor[elemconnect[i,j],1]): # check element is higher than the last 
-                    a = i*4 + j                                       # update a to have the new highest found element
-            except:                                         # first trebecular element found 
-                a = i
-                continue
-topnodeTr        = 2*a+1                            # index of the top node of the trebecular bone #Isaac: i think *2 for force fx and fy, +1 is for the y component
-topnodeHead      = 2*np.where(elemconnect[:,1] == elemconnect[:,1].max()) + 1   # top node of the implant head == top node
+            if (globalNodeCoor[a,1] < globalNodeCoor[elemconnect[i,j],1]) or first: # check element is higher than the last 
+                a = elemconnect[i,j]                                                # update a to have the new highest found element
+                first = False
+
+b = 0
+for i in range(nnodes):
+    if globalNodeCoor[i,1] > globalNodeCoor[b,1]:
+        b = i
+
+topnodeTr        = 2*a + 1                          # index of the top node of the trebecular bone #Isaac: i think *2 for force fx and fy, +1 is for the y component
+topnodeHead      = 2*b + 1                          # top node of the implant head == top node
 F                = np.zeros(K_bc.shape[0])          # Global Force vector  
-F[topnodeTr]     = +1607                                # upward force at trebecular
-F[topnodeHead]   = -1607                             # downward force at the head
+F[topnodeTr]     = +1607                            # upward force at trebecular
+F[topnodeHead]   = -1607                            # downward force at the head
 F[topnodeHead-1] = +373                       # force in x direction at the head
 print("Forces and boundary conditions determined")
 
@@ -148,10 +150,9 @@ for i in range(nelem):
 print('Maximum deformation {}'.format(maxi))
 print('Minimum deformation {}'.format(mini))
 
-plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'bo', markersize = 0.5) # plots deformations + initial position
-plt.plot(u_x + globalNodeCoor[a,0], u_y + globalNodeCoor[a,1], 'ro', markersize = 5) # plots deformations + initial position
-plt.plot(u_x + globalNodeCoor[elemconnect[:,1].index(max(elemconnect[:,1])),0], u_y + globalNodeCoor[elemconnect[:,1].index(max(elemconnect[:,1])),1], 'ro', markersize = 5) # plots deformations + initial position
-
+plt.plot(u_x    + globalNodeCoor[:, 0], u_y    + globalNodeCoor[:, 1], 'bo', markersize = 0.5) # plots each node with deformations + initial position
+plt.plot(u_x[a] + globalNodeCoor[a, 0], u_y[a] + globalNodeCoor[a, 1], 'ro', markersize = 5) # plots a marker for where a force is applied 
+plt.plot(u_x[b] + globalNodeCoor[b, 0], u_y[b] + globalNodeCoor[b, 1], 'ro', markersize = 5) # plots a marker for where a force is applied 
 
 plt.title("Deformation of mesh")
 plt.show()
