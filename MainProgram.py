@@ -24,7 +24,11 @@ elemNodeCoor   = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded elemen
 print("data imported")                    # Array storing xy coordinates of the 4 nodes in an element
 
 # Plot the Mesh and output to user
-colour_dict = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'} # defines a diffrent colour for each material
+colour_dict = {0 : 'b',
+               1 : 'r', 
+               2 : 'g', 
+               3 : 'c', 
+               4 : 'y'} # defines a diffrent colour for each material
 nx, ny = np.zeros(4), np.zeros(4) 
 plt.plot(globalNodeCoor[:, 0], globalNodeCoor[:, 1], 'bo', markersize=0.5) # plots the points 
 for i in range(nelem):
@@ -102,7 +106,7 @@ for i in range(nelem):                              # for each element
     if (2 == elemconnect[i,4]):                     # check element is the correct material (bone)
         for j in range(4):
             if (globalNodeCoor[a,1] < globalNodeCoor[elemconnect[i,j],1]) or first: # check element is higher than the last 
-                a = elemconnect[i,j]                                                # update a to have the new highest found element
+                a = elemconnect[i,j]                                                # update a to have the new highest found node
                 first = False
 
 b = 0                                               # holds the index of the top node of the head
