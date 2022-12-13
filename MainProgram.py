@@ -24,18 +24,18 @@ elemNodeCoor   = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded elemen
 print("data imported")                    # Array storing xy coordinates of the 4 nodes in an element
 
 # Plot the Mesh and output to user
-colour = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'} # defines a diffrent colour for each material
+colour_dict = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'} # defines a diffrent colour for each material
 nx, ny = np.zeros(4), np.zeros(4) 
 plt.plot(globalNodeCoor[:, 0], globalNodeCoor[:, 1], 'bo', markersize=0.5) # plots the points 
 for i in range(nelem):
-    color = colour[elemconnect[i,4]]
+    color = colour_dict[elemconnect[i,4]]
     for j in range(4):
         nx[j] = globalNodeCoor[elemconnect[i,j], 0]            
         ny[j] = globalNodeCoor[elemconnect[i,j], 1]
         if j > 0 :
-            plt.plot([nx[j-1],nx[j]],[ny[j-1],ny[j]], color)   #plot a line of the quadrangular element
+            plt.plot([nx[j-1],nx[j]],[ny[j-1],ny[j]], color = color, linewidth=0.5)   #plot a line of the quadrangular element
         if j == 3 :
-            plt.plot([nx[0],nx[3]],[ny[0],ny[3]], color)       #plot the line of the quadrangular element from the first node to the last
+            plt.plot([nx[0],nx[3]],[ny[0],ny[3]], color = color, linewidth=0.5)       #plot the line of the quadrangular element from the first node to the last
 
 plt.title("Mesh of implant")
 plt.show()
@@ -151,8 +151,8 @@ print('Maximum deformation {}'.format(maxi))
 print('Minimum deformation {}'.format(mini))
 
 plt.plot(u_x    + globalNodeCoor[:, 0], u_y    + globalNodeCoor[:, 1], 'bo', markersize = 0.5) # plots each node with deformations + initial position
-plt.plot(u_x[a] + globalNodeCoor[a, 0], u_y[a] + globalNodeCoor[a, 1], 'ro', markersize = 5) # plots a marker for where a force is applied 
-plt.plot(u_x[b] + globalNodeCoor[b, 0], u_y[b] + globalNodeCoor[b, 1], 'ro', markersize = 5) # plots a marker for where a force is applied 
+#plt.plot([u_x[a] + globalNodeCoor[a, 0]], [u_y[a] + globalNodeCoor[a, 1]], 'ro', markersize = 5) # plots a marker for where a force is applied 
+#plt.plot([u_x[b] + globalNodeCoor[b, 0]], [u_y[b] + globalNodeCoor[b, 1]], 'ro', markersize = 5) # plots a marker for where a force is applied 
 
 plt.title("Deformation of mesh")
 plt.show()
