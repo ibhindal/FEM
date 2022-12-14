@@ -12,9 +12,9 @@ from DirichletBC import DirichletBC
 
 def PythagDist(i):
     if len(i) == 2:
-        return (i[0]**2 + i[1]**2)**0.5
+        return (sum([i[0]**2, i[1]**2])**0.5)
     else:
-        return (i[0]**2 + i[1]**2 + i[2]**2)**0.5
+        return (sum([i[0]**2, i[1]**2, i[2]**2])**0.5)
 
 # Load in mesh
 Meshfilename = 'data.mat'
@@ -131,18 +131,17 @@ print("Deformation solved")                         # Calulates the displacement
 # plot the deformation, u on the mesh
 EF = 1                                              # Exageration Factor
 nx, ny, ux, uy  = np.zeros(4), np.zeros(4), np.zeros(4), np.zeros(4)
-#DeformationSum = [sum(i) for i in zip(u_x, u_y)]
 DeformationSum = [PythagDist(i) for i in zip(u_x, u_y)]
 mini = min(DeformationSum)                          # minimum deformation found in abisheks mesh with normal force, hardcoded colourma
 maxi = max(DeformationSum) 
 
 for i in range(nelem):
     for j in range(4):
-        nx[j] = globalNodeCoor[elemconnect[i,j], 0]            
-        ny[j] = globalNodeCoor[elemconnect[i,j], 1]
-        ux[j] =            u_x[elemconnect[i,j]]
-        uy[j] =            u_y[elemconnect[i,j]]
-        ratio = 2 * (ux[j]+uy[j]-mini) / (maxi - mini)
+        nx[j] = globalNodeCoor[elemconnect[i,j], 0]  # global original x coordinate of node    
+        ny[j] = globalNodeCoor[elemconnect[i,j], 1]  # global original y coordinate of node
+        ux[j] =            u_x[elemconnect[i,j]]     # x direction deformation of node
+        uy[j] =            u_y[elemconnect[i,j]]     # y direction deformation of node
+        ratio = 2 * (PythagDist([ux[j],uy[j]])-mini) / (maxi - mini)
         b = min(1, max(0, (1 - ratio)))
         r = min(1, max(0, (ratio - 1)))
         g = min(1, max(0, 1 - b - r))
@@ -188,7 +187,7 @@ for i in range(nelem):
         ny[j] = globalNodeCoor[elemconnect[i,j], 1]
         ux[j] =            u_x[elemconnect[i,j]]
         uy[j] =            u_y[elemconnect[i,j]]
-        ratio = 2 * (st_x[i] + st_y[i] + st_xy[i] - mini) / (maxi - mini)
+        ratio = 2 * (stressSum[i] - mini) / (maxi - mini)
         b = min(1, max(0, (1 - ratio)))
         r = min(1, max(0, (ratio - 1)))
         g = min(1, max(0, 1 - b - r))
