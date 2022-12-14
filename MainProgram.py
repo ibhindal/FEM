@@ -1,6 +1,7 @@
 # Main Program
 import os
 import numpy as np
+import pandas as pd
 import assembleSys
 import scipy as sp
 import scipy.io as spio
@@ -17,13 +18,24 @@ def PythagDist(i):
         return (sum([i[0]**2, i[1]**2, i[2]**2])**0.5)
 
 # Load in mesh
-Meshfilename = 'data.mat'
-mat = spio.loadmat(Meshfilename, squeeze_me=(True)) 
-print("\n\n\nfile Loaded")
-
 # Assigning variables to the data imported from MATLAB
-globalNodeCoor = mat['nodecoor']
-elemconnect    = mat['elemconnect'] - 1
+try:
+    Meshfilename = '1data.mat'
+    mat = spio.loadmat(Meshfilename, squeeze_me=(True)) 
+    globalNodeCoor = mat['nodecoor']
+    elemconnect    = mat['elemconnect'] - 1
+except:
+    data = pd.read_excel("GoodHipPos2.xlsx", sheet_name=0)
+    globalNodeCoor = data.to_numpy()
+    data = pd.read_excel("GoodHipQuads2.xlsx", sheet_name=0)
+    elemconnect = data.to_numpy()
+    for i in range(elemconnect.shape[0]):
+        elemconnect[i,0] = elemconnect[i,0] -1 
+        elemconnect[i,1] = elemconnect[i,1] -1 
+        elemconnect[i,2] = elemconnect[i,2] -1 
+        elemconnect[i,3] = elemconnect[i,3] -1 
+print("\n\n\nfile Loaded")    
+
 nnodes         = globalNodeCoor.shape[0]  # Total number of nodes in mesh  
 nelem          = elemconnect.shape[0]     # Total number of elements in mesh
 elemNodeCoor   = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
@@ -31,6 +43,7 @@ print("data imported")                    # Array storing xy coordinates of the 
 
 # Plot the Mesh and output to user
 colour_dict = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'} # defines a diffrent colour for each material
+colour_dict = {61: 'b', 62: 'r', 63: 'g', 64: 'c', 65: 'y'} 
 nx, ny = np.zeros(4), np.zeros(4) 
 plt.plot(globalNodeCoor[:, 0], globalNodeCoor[:, 1], 'bo', markersize=0.5) # plots the points 
 for i in range(nelem):
@@ -65,6 +78,7 @@ E_marrow      = 3.0e8
 nu_marrow     = 0.45
 Mat_Prop_Dict = {"Head" : [E_head, nu_head], "Stem" : [E_stem, nu_stem], "Cortical":[E_cortical,nu_cortical], "Trebecular":[E_trebecular,nu_trebecular], "Marrow":[E_marrow,nu_marrow]}
 Material      = {0 : "Head", 1 : "Stem", 2 : "Cortical", 3 : "Trebecular", 4 : "Marrow"}
+Material      = {61: "Head", 62: "Stem", 63: "Cortical", 64: "Trebecular", 65: "Marrow"} 
 print("Material properties determined")
 
 # initializes variables     
@@ -102,25 +116,52 @@ plt.savefig(flnmfig)
 
 # Determine forces 
 a = 0                                               # holds the index of the top node of the trebecular material
-first = True
+a2 = 0
+a3 = 0
+first, sec, third = True, True, True
 for i in range(nelem):                              # for each element
-    if (2 == elemconnect[i,4]):                     # check element is the correct material (bone)
+    if (64 == elemconnect[i,4]):                     # check element is the correct material (bone) #2 #64
         for j in range(4):
-            if (globalNodeCoor[a,1] < globalNodeCoor[elemconnect[i,j],1]) or first: # check element is higher than the last 
-                a = elemconnect[i,j]                                                # update a to have the new highest found node
-                first = False
+            if (globalNodeCoor[a,1] < globalNodeCoor[elemconnect[i,j],1]) or first or sec or third: # check element is higher than the last 
+                a, a2, a3 = elemconnect[i,j], a2, a3                                                # update a to have the new highest found node
+                if first:
+                    first = False
+                elif sec:
+                    sec = False
+                elif third:
+                    third = False
 
-b = 0                                               # holds the index of the top node of the head
+b, b2, b3 = 0, 0, 0                                               # holds the index of the top node of the head
 for i in range(nnodes):
     if globalNodeCoor[i,1] > globalNodeCoor[b,1]:
         b = i
+    elif globalNodeCoor[i,1] > globalNodeCoor[b2,1]:
+        b2 = i
+    elif globalNodeCoor[i,1] > globalNodeCoor[b3,1]:
+        b3 = i
 
 topnodeTr        = 2*a + 1                          # index of the top node of the trebecular bone # *2 for force fx and fy, +1 is for the y component
+#topnodeTr2       = 2*a2 + 1
+#topnodeTr3       = 2*a3 + 1
+
 topnodeHead      = 2*b + 1                          # top node of the implant head == top node
+#topnodeHead2      = 2*b2 + 1
+#topnodeHead3      = 2*b3 + 1
+
 F                = np.zeros(K_bc.shape[0])          # Global Force vector  
-F[topnodeTr]     = +1607                            # upward force at trebecular
-F[topnodeHead]   = -1607                            # downward force at the head
-F[topnodeHead-1] = +373                             # force in x direction at the head
+F[topnodeTr]     = +1607#/3                         # upward force at trebecular
+#F[topnodeTr2]     = +1607/3
+#F[topnodeTr3]     = +1607/3 
+
+F[topnodeHead]   = -1607#/3                         # downward force at the head
+F[topnodeHead-1] = +373#/3                          # force in x direction at the head
+
+#F[topnodeHead2]   = -1607/3
+#F[topnodeHead2-1] = +373/3
+
+#F[topnodeHead3]   = -1607/3
+#F[topnodeHead3-1] = +373/3
+
 print("Forces and boundary conditions determined")
 
 u = sp.sparse.linalg.spsolve(K_bc, F)               # Calculate the force matrix then we need to plot u #isaac:What?
@@ -130,9 +171,9 @@ print("Deformation solved")                         # Calulates the displacement
 
 # plot the deformation, u on the mesh
 EF = 1                                              # Exageration Factor
-nx, ny, ux, uy  = np.zeros(4), np.zeros(4), np.zeros(4), np.zeros(4)
+nx, ny, ux, uy = np.zeros(4), np.zeros(4), np.zeros(4), np.zeros(4)
 DeformationSum = [PythagDist(i) for i in zip(u_x, u_y)]
-mini = min(DeformationSum)                          # minimum deformation found in abisheks mesh with normal force, hardcoded colourma
+mini = min(DeformationSum)                           # minimum deformation found in abisheks mesh with normal force, hardcoded colourma
 maxi = max(DeformationSum) 
 
 for i in range(nelem):
@@ -154,9 +195,10 @@ for i in range(nelem):
 print('Maximum deformation {}'.format(maxi))
 print('Minimum deformation {}'.format(mini))
 
-plt.plot(u_x    + globalNodeCoor[:, 0], u_y    + globalNodeCoor[:, 1], 'bo', markersize = 0.5) # plots each node with deformations + initial position
+#plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1], 'bo', markersize = 0.5) # plots points of nodes where they would be witout deformation
+plt.plot(u_x    + globalNodeCoor[:, 0], u_y    + globalNodeCoor[:, 1], 'ro', markersize = 0.5) # plots each node with deformations + initial position
 #plt.plot([u_x[a] + globalNodeCoor[a, 0]], [u_y[a] + globalNodeCoor[a, 1]], 'ro', markersize = 5) # plots a marker for where a force is applied 
-#plt.plot([u_x[b] + globalNodeCoor[b, 0]], [u_y[b] + globalNodeCoor[b, 1]], 'ro', markersize = 5) # plots a marker for where a force is applied 
+#plt.plot([u_x[b] + globalNodeCoor[b, 0]], [u_y[b] + globalNodeCoor[b, 1]], 'ro', markersize = 5) # plots a marker for where b force is applied 
 
 plt.title("Deformation of mesh")
 plt.show()
