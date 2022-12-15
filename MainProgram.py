@@ -19,17 +19,17 @@ def PythagDist(i):
 
 ##### Importing Data #####
 try:
-    Meshfilename = '1data.mat'                   # .mat file containing mesh data
+    Meshfilename = 'data.mat'                   # .mat file containing mesh data
     mat = spio.loadmat(Meshfilename, squeeze_me=(True)) 
     globalNodeCoor = mat['nodecoor']            # Assigning Node Coordinates to a new variable
     elemconnect    = mat['elemconnect'] - 1     # Assigning Element Connectivity matrix to a new variable
 except:
     data = pd.read_excel("GoodHipPos2.xlsx", sheet_name=0)      # run this code to test group made meshes
     globalNodeCoor = data.to_numpy()
-    data = pd.read_excel("GoodHipQuads2.xlsx", sheet_name=0)
+    data = pd.read_excel("GoodHipQuads2.xlsx", sheet_name=0)    # reads the globalNodeCoor and elemconnect matrixes
     elemconnect = data.to_numpy()
     for i in range(elemconnect.shape[0]):
-        elemconnect[i,0] = elemconnect[i,0] -1 
+        elemconnect[i,0] = elemconnect[i,0] -1  # Corrects element indexes to be zero indexed
         elemconnect[i,1] = elemconnect[i,1] -1 
         elemconnect[i,2] = elemconnect[i,2] -1 
         elemconnect[i,3] = elemconnect[i,3] -1 
@@ -50,9 +50,9 @@ for i in range(nelem):                                                     # For
         nx[j] = globalNodeCoor[elemconnect[i,j], 0]                        # Finding coresponding x coordinates of the node            
         ny[j] = globalNodeCoor[elemconnect[i,j], 1]                        # Finding corresponding y coordinate of the node
         if j > 0 :
-            plt.plot([nx[j-1],nx[j]],[ny[j-1],ny[j]], color = color, linewidth=0.5)   # Plot a line of the quadrangular element
+            plt.plot([nx[j-1],nx[j]],[ny[j-1],ny[j]], color = color, linewidth = 0.5)   # Plot a line of the quadrangular element
         if j == 3 :
-            plt.plot([nx[0],nx[3]],[ny[0],ny[3]], color = color, linewidth=0.5)       # Plot the line of the quadrangular element from the first node to the last
+            plt.plot([nx[0],nx[3]],[ny[0],ny[3]], color = color, linewidth = 0.5)       # Plot the line of the quadrangular element from the first node to the last
 
 plt.title("Mesh of implant and bone")
 plt.show()
@@ -67,7 +67,6 @@ nodeCoor = []                           # Node coordinate, holding value for the
 """
 E = Young's Modulus
 nu = Poisson's Ratio
-
 """
 #Default - Co-Cr_Mo alloy
 E_head        = 2.1e11
@@ -176,7 +175,7 @@ u_y = [num for i, num in enumerate(u) if i % 2 == 1] # y component deformations 
 print("Deformation solved")                          # Calulates the displacement/ deformation
 
 ##### Solving and Plotting Deformation #####
-EF = 1                                               # Exageration Factor
+EF = 1                                               # Exageration Factor, multiplies the deformation by a scalar value for visual plot
 nx, ny, ux, uy = np.zeros(4), np.zeros(4), np.zeros(4), np.zeros(4)
 DeformationSum = [PythagDist(i) for i in zip(u_x, u_y)] # Sum of deformation of each node
 mini = min(DeformationSum)                           # Minimum deformation found in mesh
