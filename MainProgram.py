@@ -86,8 +86,7 @@ nu_trebecular = 0.3
 E_marrow      = 3.0e8
 nu_marrow     = 0.45
 Mat_Prop_Dict = {"Head" : [E_head, nu_head], "Stem" : [E_stem, nu_stem], "Cortical":[E_cortical,nu_cortical], "Trebecular":[E_trebecular,nu_trebecular], "Marrow":[E_marrow,nu_marrow]} # Dictionary containing material properties for the 5 different material types
-Material      = {0 : "Head", 1 : "Stem", 2 : "Cortical", 3 : "Trebecular", 4 : "Marrow"} # Assinging a number to each part
-Material      = {61: "Head", 62: "Stem", 63: "Cortical", 64: "Trebecular", 65: "Marrow"} 
+Material      = {0 : "Head", 1 : "Stem", 2 : "Cortical", 3 : "Trebecular", 4 : "Marrow",61: "Head", 62: "Stem", 63: "Cortical", 64: "Trebecular", 65: "Marrow"} # Assinging a number to each part
 print("Material properties determined")
 
 ##### Initializing Variables #####   
