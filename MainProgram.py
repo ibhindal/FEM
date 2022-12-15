@@ -102,7 +102,7 @@ for i in range(nelem) :                             # For each element
     v = Mat_Prop_Dict[Material[MatNo]][1]           # Poissions ratio of current material
     nodeXY = globalNodeCoor[elemconnect[i,0:4].T,:] # Finds the node coordinates of current element
     ke, DDotB = kecalc(npts,E,v,nodeXY)             # Calculates the element siffness matrix and D dot B (for stress)
-    StressDB[i, :, :] = DDotB                       # # Strain Displacement Matrix dot product with Elasticity Tensor for each element                                 
+    StressDB[i, :, :] = DDotB                       # Strain Displacement Matrix dot product with Elasticity Tensor for each element                                 
     Kg = assembleSys(Kg,ke,elemconnect[i,0:4])      # Geometric (initial stress) stiffness matrix
 
 ##### System stiffness matrix sparsity plot #####
@@ -174,7 +174,7 @@ F[topnodeHead-1] = +373#/3                          # Force in x direction at th
 
 print("Forces and boundary conditions determined")
 
-u = sp.sparse.linalg.spsolve(K_bc, F)                # Calculate the force matrix then we need to plot u #isaac:What?
+u = sp.sparse.linalg.spsolve(K_bc, F)                
 u_x = [num for i, num in enumerate(u) if i % 2 == 0] # x component deformations for each node
 u_y = [num for i, num in enumerate(u) if i % 2 == 1] # y component deformations for each node
 print("Deformation solved")                          # Calulates the displacement/ deformation
