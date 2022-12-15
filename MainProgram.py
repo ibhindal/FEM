@@ -20,7 +20,7 @@ def PythagDist(i):
 
 ##### Importing Data from MATLAB #####
 try:
-    Meshfilename = '1data.mat' # .mat file containing mesh data
+    Meshfilename = 'data.mat' # .mat file containing mesh data
     mat = spio.loadmat(Meshfilename, squeeze_me=(True)) 
     globalNodeCoor = mat['nodecoor']  # Assigning Node Coordinates to a new variable
     elemconnect    = mat['elemconnect'] - 1 # Assigning Element Connectivity matrix to a new variable
@@ -42,8 +42,7 @@ elemNodeCoor   = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded elemen
 print("data imported")                    # Array storing xy coordinates of the 4 nodes in an element
 
 ##### Plot Mesh and Output To User #####
-colour_dict = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y'} # Defines a diffrent colour for each material
-colour_dict = {61: 'b', 62: 'r', 63: 'g', 64: 'c', 65: 'y'} 
+colour_dict = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y', 61: 'b', 62: 'r', 63: 'g', 64: 'c', 65: 'y'} # Defines a diffrent colour for each material
 nx, ny = np.zeros(4), np.zeros(4) 
 plt.plot(globalNodeCoor[:, 0], globalNodeCoor[:, 1], 'bo', markersize=0.5) # Plots all the nodes from the mesh
 for i in range(nelem):                                                     # For each element 
