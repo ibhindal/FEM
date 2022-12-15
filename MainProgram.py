@@ -17,7 +17,7 @@ def PythagDist(i):
     else:
         return (sum([i[0]**2, i[1]**2, i[2]**2])**0.5)
 
-##### Importing Data from MATLAB #####
+##### Importing Data #####
 try:
     Meshfilename = '1data.mat'                   # .mat file containing mesh data
     mat = spio.loadmat(Meshfilename, squeeze_me=(True)) 
@@ -47,8 +47,8 @@ plt.plot(globalNodeCoor[:, 0], globalNodeCoor[:, 1], 'bo', markersize=0.5) # Plo
 for i in range(nelem):                                                     # For each element 
     color = colour_dict[elemconnect[i,4]]                                  # Assigning colour to each node depending on material type 
     for j in range(4):
-        nx[j] = globalNodeCoor[elemconnect[i,j], 0] # Finding coresponding x coordinates of the node            
-        ny[j] = globalNodeCoor[elemconnect[i,j], 1] # Finding corresponding y coordinate of the node
+        nx[j] = globalNodeCoor[elemconnect[i,j], 0]                        # Finding coresponding x coordinates of the node            
+        ny[j] = globalNodeCoor[elemconnect[i,j], 1]                        # Finding corresponding y coordinate of the node
         if j > 0 :
             plt.plot([nx[j-1],nx[j]],[ny[j-1],ny[j]], color = color, linewidth=0.5)   # Plot a line of the quadrangular element
         if j == 3 :
