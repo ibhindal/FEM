@@ -19,7 +19,7 @@ def PythagDist(i):
 
 ##### Importing Data from MATLAB #####
 try:
-    Meshfilename = 'data.mat'                   # .mat file containing mesh data
+    Meshfilename = '1data.mat'                   # .mat file containing mesh data
     mat = spio.loadmat(Meshfilename, squeeze_me=(True)) 
     globalNodeCoor = mat['nodecoor']            # Assigning Node Coordinates to a new variable
     elemconnect    = mat['elemconnect'] - 1     # Assigning Element Connectivity matrix to a new variable
