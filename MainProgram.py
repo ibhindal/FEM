@@ -17,6 +17,10 @@ def PythagDist(i):
     else:
         return (sum([i[0]**2, i[1]**2, i[2]**2])**0.5)
 
+##### Mean of three values, used for mean stress of each element ####
+def MeanSt(i):
+    return (1/3)*(i[0]+i[1]+i[2])
+
 ##### Importing Data #####
 try:
     Meshfilename = 'data.mat'                   # .mat file containing mesh data
@@ -35,10 +39,10 @@ except:
         elemconnect[i,3] = elemconnect[i,3] -1 
 print("\n\n\nfile Loaded")    
 
-nnodes         = globalNodeCoor.shape[0]  # Total number of nodes in mesh  
-nelem          = elemconnect.shape[0]     # Total number of elements in mesh
-elemNodeCoor   = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
-print("data imported")                    # Array storing xy coordinates of the 4 nodes in an element
+nnodes         = globalNodeCoor.shape[0]        # Total number of nodes in mesh  
+nelem          = elemconnect.shape[0]           # Total number of elements in mesh
+elemNodeCoor   = np.zeros((nelem,4,2))          # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
+print("data imported")                          # Array storing xy coordinates of the 4 nodes in an element
 
 ##### Plot Mesh and Output To User #####
 colour_dict = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y', 61: 'b', 62: 'r', 63: 'g', 64: 'c', 65: 'y'} # Defines a diffrent colour for each material
@@ -58,10 +62,10 @@ plt.title("Mesh of implant and bone")
 plt.show()
 
 ##### Initialising Variables and Constants ##### 
-dofpn    = 2                            # Degrees of freedom per node, x co-or and y co-or
-npts     = 4                            # Number of points per element
-ndof     = nnodes*dofpn                 # Total number of dof
-nodeCoor = []                           # Node coordinate, holding value for the current node                             
+dofpn    = 2                                    # Degrees of freedom per node, x co-or and y co-or
+npts     = 4                                    # Number of points per element
+ndof     = nnodes*dofpn                         # Total number of dof
+nodeCoor = []                                   # Node coordinate, holding value for the current node                             
 
 ##### Material Properties #####
 """
@@ -224,6 +228,7 @@ st_x  = [num for i, num in enumerate(stress) if i % 3 == 0] # x component deform
 st_y  = [num for i, num in enumerate(stress) if i % 3 == 1] # y component deformations for each node
 st_xy = [num for i, num in enumerate(stress) if i % 3 == 2] 
 stressSum = [PythagDist(i) for i in zip(st_x, st_y, st_xy)] # Sum of stresses
+MeanStress= [MeanSt(i)     for i in zip(st_x, st_y, st_xy)] # Mean stresses
 mini = min(stressSum)                                       # Minimum stress found in mesh 
 maxi = max(stressSum)                                       # Maximum stress found in mesh 
 
@@ -243,8 +248,10 @@ for i in range(nelem):                                      # For number of elem
         if j == 3 :
             plt.plot([nx[0]+ux[0]*EF,nx[3]+ux[3]*EF],[ny[0]+uy[0]*EF,ny[3]+uy[3]*EF], color = (r, g, b))           # Plot the line of the quadrangular element from the first node to the last
                                                                                                                    # set colour scheme to be a measure of stress (blue to red colour bar), RGB tuple format
-print('Maximum Stress {}'.format(maxi))
+print('Maximum Stress {}'.format(maxi)) 
 print('Minimum Stress {}'.format(mini))
+print('Maximum Mean Stress {}'.format(max(MeanStress))) # The principal plane, The plane in which the shear stress is zero or independant of shear stress. On the principle plane this calculation is valid
+print('Minimum Mean Stress {}'.format(min(MeanStress)))
 plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'bo', markersize = 0.5) # Plots location of each node (initial position + deformation) as a dot
 plt.title("Stress of mesh")
 plt.show()
