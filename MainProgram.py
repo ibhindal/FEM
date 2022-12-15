@@ -1,17 +1,16 @@
 # Main Program
-import os
 import numpy as np
 import pandas as pd
-import assembleSys
 import scipy as sp
 import scipy.io as spio
-from ke import kecalc
 import matplotlib.pyplot as plt
+import assembleSys
+from ke import kecalc
 from assembleSys import assembleSys
 from DirichletBC import DirichletBC
 #from matplotlib.tri import Triangulation
 
-##### Pythag for x & y nodal stress/deformation calculations #####
+##### Pythagorous a**2 + b**2 = c**2, used for x & y nodal stress/deformation calculations #####
 def PythagDist(i):
     if len(i) == 2:
         return (sum([i[0]**2, i[1]**2])**0.5)
@@ -20,12 +19,12 @@ def PythagDist(i):
 
 ##### Importing Data from MATLAB #####
 try:
-    Meshfilename = 'data.mat' # .mat file containing mesh data
+    Meshfilename = 'data.mat'                   # .mat file containing mesh data
     mat = spio.loadmat(Meshfilename, squeeze_me=(True)) 
-    globalNodeCoor = mat['nodecoor']  # Assigning Node Coordinates to a new variable
-    elemconnect    = mat['elemconnect'] - 1 # Assigning Element Connectivity matrix to a new variable
+    globalNodeCoor = mat['nodecoor']            # Assigning Node Coordinates to a new variable
+    elemconnect    = mat['elemconnect'] - 1     # Assigning Element Connectivity matrix to a new variable
 except:
-    data = pd.read_excel("GoodHipPos2.xlsx", sheet_name=0)
+    data = pd.read_excel("GoodHipPos2.xlsx", sheet_name=0)      # run this code to test group made meshes
     globalNodeCoor = data.to_numpy()
     data = pd.read_excel("GoodHipQuads2.xlsx", sheet_name=0)
     elemconnect = data.to_numpy()
@@ -94,7 +93,7 @@ shapefundx = shapefunde = jacob = []                # Shape function (dx), shape
 Kg         = sp.sparse.csr_matrix((ndof,ndof))      # Geometric (initial stress) stiffness matrix
 StressDB   = np.zeros([nelem, 3, 8])                # Stress matrix initalization
 
-##### #####
+##### Calculating global stiffness matrix #####
 for i in range(nelem) :                             # For each element                  
     MatNo = elemconnect[i,4]    
     E = Mat_Prop_Dict[Material[MatNo]][0]           # Youngs modulus of current material
@@ -105,7 +104,7 @@ for i in range(nelem) :                             # For each element
     Kg = assembleSys(Kg,ke,elemconnect[i,0:4])      # Geometric (initial stress) stiffness matrix
 
 ##### System stiffness matrix sparsity plot #####
-plt.spy(Kg, markersize=0.1)                         
+plt.spy(Kg, markersize=0.1)                         # creates a plot of all non zero values using the equivalent, non sparce form, indecies                      
 plt.title("Stiffness matrices")
 plt.show()
 print('Stiffness Matrices calculated')
@@ -124,12 +123,10 @@ flnmfig = "sparsity_K_beforeBC.png"
 plt.savefig(flnmfig)
 
 ##### Determining Forces ##### 
-a = 0                                               # Holds the index of the top node of the trebecular material
-a2 = 0
-a3 = 0
+a, a2, a3 = 0, 0, 0                                        # Holds the index of the top node(s) of the trebecular material
 first, sec, third = True, True, True
-for i in range(nelem):                              # For each element
-    if (64 == elemconnect[i,4]):                    # Check element is the correct material (bone) 
+for i in range(nelem):                                     # For each element
+    if (64 == elemconnect[i,4] or 2 == elemconnect[i,4]):  # Check element is the correct material (bone) 
         for j in range(4):
             if (globalNodeCoor[a,1] < globalNodeCoor[elemconnect[i,j],1]) or first or sec or third: # Check element is higher than the last 
                 a, a2, a3 = elemconnect[i,j], a2, a3                                                # Update a to have the new highest found node
@@ -140,10 +137,10 @@ for i in range(nelem):                              # For each element
                 elif third:
                     third = False
 
-b, b2, b3 = 0, 0, 0                                   # Holds the index of the top node of the head
+b, b2, b3 = 0, 0, 0                                 # Holds the index of the top node of the head
 for i in range(nnodes):
-    if globalNodeCoor[i,1] > globalNodeCoor[b,1]:     # Checks if node y-coordinate is higher than the last
-        b = i                                         # Sets b as the index of the top node
+    if globalNodeCoor[i,1] > globalNodeCoor[b,1]:   # Checks if node y-coordinate is higher than the last
+        b = i                                       # Sets b as the index of the top node
     elif globalNodeCoor[i,1] > globalNodeCoor[b2,1]:
         b2 = i
     elif globalNodeCoor[i,1] > globalNodeCoor[b3,1]:
@@ -205,7 +202,7 @@ print('Maximum deformation {}'.format(maxi))
 print('Minimum deformation {}'.format(mini))
 
 #plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1], 'bo', markersize = 0.5) # plots points of nodes where they would be witout deformation
-plt.plot(u_x    + globalNodeCoor[:, 0], u_y    + globalNodeCoor[:, 1], 'ro', markersize = 0.5) # plots each node with deformations + initial position
+plt.plot(u_x    + globalNodeCoor[:, 0], u_y    + globalNodeCoor[:, 1], 'o', markersize = 0.5) # plots each node with deformations + initial position
 #plt.plot([u_x[a] + globalNodeCoor[a, 0]], [u_y[a] + globalNodeCoor[a, 1]], 'ro', markersize = 5) # plots a marker for where a force is applied 
 #plt.plot([u_x[b] + globalNodeCoor[b, 0]], [u_y[b] + globalNodeCoor[b, 1]], 'ro', markersize = 5) # plots a marker for where b force is applied 
 
