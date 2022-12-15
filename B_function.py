@@ -4,20 +4,21 @@ import JacobianMat
 import strainDisp2D
 
 def B_function(N, dndx, dnde ,nodeXY):
-    """
-   B function is the strain displacement matrix requuires xi, eta and nodal coords
+    
+   """
+   Prepares the shape function, jacobian and nodal coordinates 
+   in the right format to be passed on to strainDisp2D
    Inputs :
-        N      : Shape function
-        dndx   : 
-        dnde   : 
+        N      : Shape function matrix
+        dndx   : Derivative of          w.r.t xi
+        dnde   : Derivative of          w.r.t eta
         nodeXY : x y co-ordinates of the element
    Returns:
-        B : the strain diplacement matrix 
+        B : Strain diplacement matrix, passed on from strainDisp2D
    """
-    #N, dndx, dnde = shapefunDeri.shapefunDeri(xi, eta) 
-
-    Jacob, SF = {}, {}                                                                              # Jacobian, Shape function
-    SF['sf'],   SF['dndx'],    SF['dnde']    = N, dndx, dnde                                        # 
-    Jacob['J'], Jacob['detJ'], Jacob['invJ'] = JacobianMat.ajacob(SF['dndx'], SF['dnde'], nodeXY) 
-    B = strainDisp2D.strainDisp2D(SF,nodeXY,Jacob)                                                  # Strain displacement matix
-    return B
+   
+   Jacob, SF = {}, {}                                                                              # Jacobian, Shape function dictionaries
+   SF['sf'],   SF['dndx'],    SF['dnde']    = N, dndx, dnde                                        # Assigning SF dictionary items to function inputs inputs
+   Jacob['J'], Jacob['detJ'], Jacob['invJ'] = JacobianMat.ajacob(SF['dndx'], SF['dnde'], nodeXY)   # Assigning Jacob dictionary items to ajacob function returns
+   B = strainDisp2D.strainDisp2D(SF,nodeXY,Jacob)                                                  # Strain displacement matix
+   return B

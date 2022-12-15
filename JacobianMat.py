@@ -5,6 +5,7 @@
 import numpy as np
 
 def ajacob(dndx,dnde,nodecoor) : 
+    
     """ 
     calculates Jacobian at the local coordinate point (xi,eta) 
     Inputs : 
@@ -17,19 +18,19 @@ def ajacob(dndx,dnde,nodecoor) :
         detj : the determinant of the Jacobian matrix
         I    : the inverse of the jacobian
     """ 
-    ai = np.zeros([2,2]) 
-    ai[0,0] = np.dot(dndx,nodecoor[:,0]) #sum of dndx with xi 
-    ai[0,1] = np.dot(dndx,nodecoor[:,1]) #sum of dndx with yi 
-    ai[1,0] = np.dot(dnde,nodecoor[:,0]) #sum of dnde with xi 
-    ai[1,1] = np.dot(dnde,nodecoor[:,1]) #sum of dnde with yi 
+    ai = np.zeros([2,2])                 # Initialize 2x2 Jacobian matrix
+    ai[0,0] = np.dot(dndx,nodecoor[:,0]) # Sum of dndx with xi 
+    ai[0,1] = np.dot(dndx,nodecoor[:,1]) # Sum of dndx with yi 
+    ai[1,0] = np.dot(dnde,nodecoor[:,0]) # Sum of dnde with xi 
+    ai[1,1] = np.dot(dnde,nodecoor[:,1]) # Sum of dnde with yi 
     
-    detj = ai[0,0] * ai[1,1] - ai[1,0] * ai[0,1] # determinant of the Jacobian 
+    detj = ai[0,0] * ai[1,1] - ai[1,0] * ai[0,1] # Determinant of the Jacobian 
      
-    I = np.zeros    # calculate the inverse of the jacobian
+    I = np.zeros # Initialize inverse of Jacobian
     
     if detj == 0 : 
         print("Singular matrix !!!") 
     else : 
-        I = np.linalg.inv(ai) 
+        I = np.linalg.inv(ai) # Calculate inverse of the Jacobian
         
     return ai, detj, I
