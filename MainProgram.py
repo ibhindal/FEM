@@ -188,7 +188,7 @@ for i in range(nelem):
         ny[j] = globalNodeCoor[elemconnect[i,j], 1]  # Global original y coordinate of node
         ux[j] =            u_x[elemconnect[i,j]]     # x-direction deformation of node
         uy[j] =            u_y[elemconnect[i,j]]     # y-direction deformation of node
-        ratio = 2 * (PythagDist([ux[j],uy[j]])-mini) / (maxi - mini) # For deformation colour scale
+        ratio = 2 * (PythagDist([ux[j],uy[j]])-mini) / (maxi - mini) # used for ratio of red, green and blue for deformation colour scale
         b = min(1, max(0, (1 - ratio)))
         r = min(1, max(0, (ratio - 1)))
         g = min(1, max(0, 1 - b - r))
@@ -197,12 +197,12 @@ for i in range(nelem):
             plt.plot([nx[j-1]+ux[j-1]*EF,nx[j]+ux[j]*EF],[ny[j-1]+uy[j-1]*EF,ny[j]+uy[j]*EF], color = (r, g, b))   # Plot a line of the quadrangular element
         if j == 3 :
             plt.plot([nx[0]+ux[0]*EF,nx[3]+ux[3]*EF],[ny[0]+uy[0]*EF,ny[3]+uy[3]*EF], color = (r, g, b))           # Plot the line of the quadrangular element from the first node to the last
-                                                                                                                   # set colour scheme to be a measure of deformation (green to red coloours bar), RGB tuple format
+                                                                                                                   # set colour scheme to be a measure of deformation (blue to red colour bar), RGB tuple format
 print('Maximum deformation {}'.format(maxi))
 print('Minimum deformation {}'.format(mini))
 
 #plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1], 'bo', markersize = 0.5) # plots points of nodes where they would be witout deformation
-plt.plot(u_x    + globalNodeCoor[:, 0], u_y    + globalNodeCoor[:, 1], 'o', markersize = 0.5) # plots each node with deformations + initial position
+plt.plot(u_x    + globalNodeCoor[:, 0], u_y    + globalNodeCoor[:, 1], 'o', markersize = 0.5) # Plots location of each node (initial position + deformation) as a dot
 #plt.plot([u_x[a] + globalNodeCoor[a, 0]], [u_y[a] + globalNodeCoor[a, 1]], 'ro', markersize = 5) # plots a marker for where a force is applied 
 #plt.plot([u_x[b] + globalNodeCoor[b, 0]], [u_y[b] + globalNodeCoor[b, 1]], 'ro', markersize = 5) # plots a marker for where b force is applied 
 
@@ -234,7 +234,7 @@ for i in range(nelem):                                      # For number of elem
         ny[j] = globalNodeCoor[elemconnect[i,j], 1]         # Global original y coordinate of node 
         ux[j] =            u_x[elemconnect[i,j]]            # x-direction deformation of node
         uy[j] =            u_y[elemconnect[i,j]]            # y-direction deformation of node
-        ratio = 2 * (stressSum[i] - mini) / (maxi - mini)   # For stress colour scale
+        ratio = 2 * (stressSum[i] - mini) / (maxi - mini)   # used for ratio of red, green and blue for stress colour scale
         b = min(1, max(0, (1 - ratio)))
         r = min(1, max(0, (ratio - 1)))
         g = min(1, max(0, 1 - b - r))
@@ -243,10 +243,10 @@ for i in range(nelem):                                      # For number of elem
             plt.plot([nx[j-1]+ux[j-1]*EF,nx[j]+ux[j]*EF],[ny[j-1]+uy[j-1]*EF,ny[j]+uy[j]*EF], color = (r, g, b))   # Plot a line of the quadrangular element
         if j == 3 :
             plt.plot([nx[0]+ux[0]*EF,nx[3]+ux[3]*EF],[ny[0]+uy[0]*EF,ny[3]+uy[3]*EF], color = (r, g, b))           # Plot the line of the quadrangular element from the first node to the last
-                                                                                                                   # set colour scheme to be a measure of deformation (green to red coloours bar), RGB tuple format
+                                                                                                                   # set colour scheme to be a measure of stress (blue to red colour bar), RGB tuple format
 print('Maximum Stress {}'.format(maxi))
 print('Minimum Stress {}'.format(mini))
-plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'bo', markersize = 0.5) # Plots stress at each node + initial position
+plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'bo', markersize = 0.5) # Plots location of each node (initial position + deformation) as a dot
 plt.title("Stress of mesh")
 plt.show()
 
