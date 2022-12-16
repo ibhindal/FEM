@@ -17,7 +17,11 @@ def PythagDist(i):
     else:
         return (sum([i[0]**2, i[1]**2, i[2]**2])**0.5)
 
-##### Importing Data from MATLAB #####
+##### Mean of three values, used for mean stress of each element ####
+def MeanSt(i):
+    return (1/3)*(i[0]+i[1]+i[2])
+
+##### Importing Data #####
 try:
     Meshfilename = 'data.mat'                   # .mat file containing mesh data
     mat = spio.loadmat(Meshfilename, squeeze_me=(True)) 
@@ -26,19 +30,19 @@ try:
 except:
     data = pd.read_excel("GoodHipPos2.xlsx", sheet_name=0)      # run this code to test group made meshes
     globalNodeCoor = data.to_numpy()
-    data = pd.read_excel("GoodHipQuads2.xlsx", sheet_name=0)
+    data = pd.read_excel("GoodHipQuads2.xlsx", sheet_name=0)    # reads the globalNodeCoor and elemconnect matrixes
     elemconnect = data.to_numpy()
     for i in range(elemconnect.shape[0]):
-        elemconnect[i,0] = elemconnect[i,0] -1 
+        elemconnect[i,0] = elemconnect[i,0] -1  # Corrects element indexes to be zero indexed
         elemconnect[i,1] = elemconnect[i,1] -1 
         elemconnect[i,2] = elemconnect[i,2] -1 
         elemconnect[i,3] = elemconnect[i,3] -1 
 print("\n\n\nfile Loaded")    
 
-nnodes         = globalNodeCoor.shape[0]  # Total number of nodes in mesh  
-nelem          = elemconnect.shape[0]     # Total number of elements in mesh
-elemNodeCoor   = np.zeros((nelem,4,2))    # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
-print("data imported")                    # Array storing xy coordinates of the 4 nodes in an element
+nnodes         = globalNodeCoor.shape[0]        # Total number of nodes in mesh  
+nelem          = elemconnect.shape[0]           # Total number of elements in mesh
+elemNodeCoor   = np.zeros((nelem,4,2))          # Node coordinates of a 4 noded element. Assumes all elements in the mesh have 4 nodes.
+print("data imported")                          # Array storing xy coordinates of the 4 nodes in an element
 
 ##### Plot Mesh and Output To User #####
 colour_dict = {0 : 'b', 1 : 'r', 2 : 'g', 3 : 'c', 4 : 'y', 61: 'b', 62: 'r', 63: 'g', 64: 'c', 65: 'y'} # Defines a diffrent colour for each material
@@ -47,27 +51,26 @@ plt.plot(globalNodeCoor[:, 0], globalNodeCoor[:, 1], 'bo', markersize=0.5) # Plo
 for i in range(nelem):                                                     # For each element 
     color = colour_dict[elemconnect[i,4]]                                  # Assigning colour to each node depending on material type 
     for j in range(4):
-        nx[j] = globalNodeCoor[elemconnect[i,j], 0] # Finding coresponding x coordinates of the node            
-        ny[j] = globalNodeCoor[elemconnect[i,j], 1] # Finding corresponding y coordinate of the node
+        nx[j] = globalNodeCoor[elemconnect[i,j], 0]                        # Finding coresponding x coordinates of the node            
+        ny[j] = globalNodeCoor[elemconnect[i,j], 1]                        # Finding corresponding y coordinate of the node
         if j > 0 :
-            plt.plot([nx[j-1],nx[j]],[ny[j-1],ny[j]], color = color, linewidth=0.5)   # Plot a line of the quadrangular element
+            plt.plot([nx[j-1],nx[j]],[ny[j-1],ny[j]], color = color, linewidth = 0.5)   # Plot a line of the quadrangular element
         if j == 3 :
-            plt.plot([nx[0],nx[3]],[ny[0],ny[3]], color = color, linewidth=0.5)       # Plot the line of the quadrangular element from the first node to the last
+            plt.plot([nx[0],nx[3]],[ny[0],ny[3]], color = color, linewidth = 0.5)       # Plot the line of the quadrangular element from the first node to the last
 
 plt.title("Mesh of implant and bone")
 plt.show()
 
 ##### Initialising Variables and Constants ##### 
-dofpn    = 2                            # Degrees of freedom per node, x co-or and y co-or
-npts     = 4                            # Number of points per element
-ndof     = nnodes*dofpn                 # Total number of dof
-nodeCoor = []                           # Node coordinate, holding value for the current node                             
+dofpn    = 2                                    # Degrees of freedom per node, x co-or and y co-or
+npts     = 4                                    # Number of points per element
+ndof     = nnodes*dofpn                         # Total number of dof
+nodeCoor = []                                   # Node coordinate, holding value for the current node                             
 
 ##### Material Properties #####
 """
 E = Young's Modulus
 nu = Poisson's Ratio
-
 """
 #Default - Co-Cr_Mo alloy
 E_head        = 2.1e11
@@ -176,7 +179,7 @@ u_y = [num for i, num in enumerate(u) if i % 2 == 1] # y component deformations 
 print("Deformation solved")                          # Calulates the displacement/ deformation
 
 ##### Solving and Plotting Deformation #####
-EF = 1                                               # Exageration Factor
+EF = 1                                               # Exageration Factor, multiplies the deformation by a scalar value for visual plot
 nx, ny, ux, uy = np.zeros(4), np.zeros(4), np.zeros(4), np.zeros(4)
 DeformationSum = [PythagDist(i) for i in zip(u_x, u_y)] # Sum of deformation of each node
 mini = min(DeformationSum)                           # Minimum deformation found in mesh
@@ -188,7 +191,7 @@ for i in range(nelem):
         ny[j] = globalNodeCoor[elemconnect[i,j], 1]  # Global original y coordinate of node
         ux[j] =            u_x[elemconnect[i,j]]     # x-direction deformation of node
         uy[j] =            u_y[elemconnect[i,j]]     # y-direction deformation of node
-        ratio = 2 * (PythagDist([ux[j],uy[j]])-mini) / (maxi - mini) # For deformation colour scale
+        ratio = 2 * (PythagDist([ux[j],uy[j]])-mini) / (maxi - mini) # used for ratio of red, green and blue for deformation colour scale
         b = min(1, max(0, (1 - ratio)))
         r = min(1, max(0, (ratio - 1)))
         g = min(1, max(0, 1 - b - r))
@@ -197,12 +200,12 @@ for i in range(nelem):
             plt.plot([nx[j-1]+ux[j-1]*EF,nx[j]+ux[j]*EF],[ny[j-1]+uy[j-1]*EF,ny[j]+uy[j]*EF], color = (r, g, b))   # Plot a line of the quadrangular element
         if j == 3 :
             plt.plot([nx[0]+ux[0]*EF,nx[3]+ux[3]*EF],[ny[0]+uy[0]*EF,ny[3]+uy[3]*EF], color = (r, g, b))           # Plot the line of the quadrangular element from the first node to the last
-                                                                                                                   # set colour scheme to be a measure of deformation (green to red coloours bar), RGB tuple format
+                                                                                                                   # set colour scheme to be a measure of deformation (blue to red colour bar), RGB tuple format
 print('Maximum deformation {}'.format(maxi))
 print('Minimum deformation {}'.format(mini))
 
 #plt.plot(globalNodeCoor[:, 0],globalNodeCoor[:, 1], 'bo', markersize = 0.5) # plots points of nodes where they would be witout deformation
-plt.plot(u_x    + globalNodeCoor[:, 0], u_y    + globalNodeCoor[:, 1], 'o', markersize = 0.5) # plots each node with deformations + initial position
+plt.plot(u_x    + globalNodeCoor[:, 0], u_y    + globalNodeCoor[:, 1], 'o', markersize = 0.5) # Plots location of each node (initial position + deformation) as a dot
 #plt.plot([u_x[a] + globalNodeCoor[a, 0]], [u_y[a] + globalNodeCoor[a, 1]], 'ro', markersize = 5) # plots a marker for where a force is applied 
 #plt.plot([u_x[b] + globalNodeCoor[b, 0]], [u_y[b] + globalNodeCoor[b, 1]], 'ro', markersize = 5) # plots a marker for where b force is applied 
 
@@ -225,6 +228,7 @@ st_x  = [num for i, num in enumerate(stress) if i % 3 == 0] # x component deform
 st_y  = [num for i, num in enumerate(stress) if i % 3 == 1] # y component deformations for each node
 st_xy = [num for i, num in enumerate(stress) if i % 3 == 2] 
 stressSum = [PythagDist(i) for i in zip(st_x, st_y, st_xy)] # Sum of stresses
+MeanStress= [MeanSt(i)     for i in zip(st_x, st_y, st_xy)] # Mean stresses
 mini = min(stressSum)                                       # Minimum stress found in mesh 
 maxi = max(stressSum)                                       # Maximum stress found in mesh 
 
@@ -234,7 +238,7 @@ for i in range(nelem):                                      # For number of elem
         ny[j] = globalNodeCoor[elemconnect[i,j], 1]         # Global original y coordinate of node 
         ux[j] =            u_x[elemconnect[i,j]]            # x-direction deformation of node
         uy[j] =            u_y[elemconnect[i,j]]            # y-direction deformation of node
-        ratio = 2 * (stressSum[i] - mini) / (maxi - mini)   # For stress colour scale
+        ratio = 2 * (stressSum[i] - mini) / (maxi - mini)   # used for ratio of red, green and blue for stress colour scale
         b = min(1, max(0, (1 - ratio)))
         r = min(1, max(0, (ratio - 1)))
         g = min(1, max(0, 1 - b - r))
@@ -243,10 +247,12 @@ for i in range(nelem):                                      # For number of elem
             plt.plot([nx[j-1]+ux[j-1]*EF,nx[j]+ux[j]*EF],[ny[j-1]+uy[j-1]*EF,ny[j]+uy[j]*EF], color = (r, g, b))   # Plot a line of the quadrangular element
         if j == 3 :
             plt.plot([nx[0]+ux[0]*EF,nx[3]+ux[3]*EF],[ny[0]+uy[0]*EF,ny[3]+uy[3]*EF], color = (r, g, b))           # Plot the line of the quadrangular element from the first node to the last
-                                                                                                                   # set colour scheme to be a measure of deformation (green to red coloours bar), RGB tuple format
-print('Maximum Stress {}'.format(maxi))
+                                                                                                                   # set colour scheme to be a measure of stress (blue to red colour bar), RGB tuple format
+print('Maximum Stress {}'.format(maxi)) 
 print('Minimum Stress {}'.format(mini))
-plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'bo', markersize = 0.5) # Plots stress at each node + initial position
+print('Maximum Mean Stress {}'.format(max(MeanStress))) # The principal plane, The plane in which the shear stress is zero or independant of shear stress. On the principle plane this calculation is valid
+print('Minimum Mean Stress {}'.format(min(MeanStress)))
+plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'bo', markersize = 0.5) # Plots location of each node (initial position + deformation) as a dot
 plt.title("Stress of mesh")
 plt.show()
 
