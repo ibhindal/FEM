@@ -4,6 +4,7 @@ import pandas as pd
 import scipy as sp
 import scipy.io as spio
 import matplotlib.pyplot as plt
+import math
 import assembleSys
 from ke import kecalc
 from assembleSys import assembleSys
@@ -20,6 +21,11 @@ def PythagDist(i):
 ##### Mean of three values, used for mean stress of each element ####
 def MeanSt(i):
     return (1/3)*(i[0]+i[1]+i[2])
+
+##### calculates Principle stress for an element 1 ####
+def principleSt(i):
+    return (abs(i[0] * 0.5 + i[1] * 0.5) + math.sqrt((i[0] * 0.5 - i[1] * 0.5)**2 + i[2]**2))
+
 
 ##### Importing Data #####
 try:
@@ -229,8 +235,9 @@ st_y  = [num for i, num in enumerate(stress) if i % 3 == 1] # y component deform
 st_xy = [num for i, num in enumerate(stress) if i % 3 == 2] 
 stressSum = [PythagDist(i) for i in zip(st_x, st_y, st_xy)] # Sum of stresses
 MeanStress= [MeanSt(i)     for i in zip(st_x, st_y, st_xy)] # Mean stresses
-mini = min(stressSum)                                       # Minimum stress found in mesh 
-maxi = max(stressSum)                                       # Maximum stress found in mesh 
+PrinStress= [principleSt(i)for i in zip(st_x, st_y, st_xy)] # Principle stresses
+mini = min(PrinStress)                                      # Minimum stress found in mesh 
+maxi = max(PrinStress)                                      # Maximum stress found in mesh 
 
 for i in range(nelem):                                      # For number of elements
     for j in range(4):                                  
@@ -248,8 +255,10 @@ for i in range(nelem):                                      # For number of elem
         if j == 3 :
             plt.plot([nx[0]+ux[0]*EF,nx[3]+ux[3]*EF],[ny[0]+uy[0]*EF,ny[3]+uy[3]*EF], color = (r, g, b))           # Plot the line of the quadrangular element from the first node to the last
                                                                                                                    # set colour scheme to be a measure of stress (blue to red colour bar), RGB tuple format
-print('Maximum Stress {}'.format(maxi)) 
-print('Minimum Stress {}'.format(mini))
+print('Maximum Principle Stress {}'.format(max(PrinStress))) 
+print('Minimum Principle Stress {}'.format(min(PrinStress)))
+print('Maximum Stress {}'.format(max(stressSum))) 
+print('Minimum Stress {}'.format(min(stressSum)))
 print('Maximum Mean Stress {}'.format(max(MeanStress))) # The principal plane, The plane in which the shear stress is zero or independant of shear stress. On the principle plane this calculation is valid
 print('Minimum Mean Stress {}'.format(min(MeanStress)))
 plt.plot(u_x + globalNodeCoor[:,0], u_y + globalNodeCoor[:,1], 'bo', markersize = 0.5) # Plots location of each node (initial position + deformation) as a dot
