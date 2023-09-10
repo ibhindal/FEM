@@ -1,6 +1,5 @@
 """
 Function to calculate area
-@author: abhishek
 """
 import numpy as np
 from numpy import *

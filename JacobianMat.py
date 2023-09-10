@@ -1,7 +1,6 @@
 
-# Python subroutine to evaluate Jacobian for a 2D quadrangular element
-# 5
-# @author: abhishek
+# Python subroutine to evaluate Jacobian for a 2D quadrangular element 5
+
 import numpy as np
 
 def ajacob(dndx,dnde,nodecoor) : 
